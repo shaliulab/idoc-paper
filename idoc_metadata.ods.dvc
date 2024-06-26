@@ -1,0 +1,5 @@
+outs:
+- md5: afb3ff69c4a9a3778deb64893066c9c5
+  size: 95363
+  hash: md5
+  path: idoc_metadata.ods

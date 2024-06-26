@@ -1,0 +1,5 @@
+outs:
+- md5: 177cba3301ecd775734787e7ceca9387
+  size: 11921
+  hash: md5
+  path: dt_bin.RDS

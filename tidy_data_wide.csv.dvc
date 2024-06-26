@@ -1,0 +1,5 @@
+outs:
+- md5: 99582b883fb2f3500bdc053a3ff823e6
+  size: 380941
+  hash: md5
+  path: tidy_data_wide.csv
