@@ -1,5 +1,6 @@
 /idoc_metadata.ods
 /CHuiData.ods
 /dt_bin.RDS
-figures/
 /tidy_data_wide.csv
+figures/
+.ipynb_checkpoints/
