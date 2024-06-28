@@ -1,0 +1,5 @@
+outs:
+- md5: 9e110eaf298bb618d8aa17e45f4ba1ab
+  size: 9095
+  hash: md5
+  path: dt_bin_gtacr.RDS

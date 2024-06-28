@@ -4,3 +4,6 @@
 /tidy_data_wide.csv
 figures/
 .ipynb_checkpoints/
+1_CHui_tidy_data.R.ipynb
+1_tidy_data.R.ipynb
+/dt_bin_gtacr.RDS
