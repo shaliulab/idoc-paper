@@ -17,7 +17,9 @@ add_ghost_data <- function(dt, id, x, columns, group, to_wide=TRUE) {
     time_index <- data.table(x=index)
     for (group in groups) {
         diff <- group_size[group__ == group, diff]
-        if (diff > 0) {
+        print(length(diff))
+
+        if (length(diff)>0 && diff > 0) {
             for (i in 1:diff) {
                 d <- data.table(group__ = group, id = paste0(group, "_", i), x = index)
                 for (column in columns) {
