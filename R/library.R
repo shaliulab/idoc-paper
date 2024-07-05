@@ -157,7 +157,7 @@ read_idoc_metadata <- function(file, sheets, columns, backend=readxl::read_xlsx)
                 dt$sheet <- sheet
                 dt$row_number <- 1:nrow(dt)
                 dt$Files <- as.character(dt$Files)
-                Files_formatted <- as.character(as.Date(as.integer(dt$Files), origin = "1899-12-30"))
+                suppressWarnings(Files_formatted <- as.character(as.Date(as.integer(dt$Files), origin = "1899-12-30")))
                 dt$Files[!is.na(Files_formatted)] <- Files_formatted[!is.na(Files_formatted)]
                 dt$POST <- as.numeric(dt$POST)
                 dt$PRE <- as.numeric(dt$PRE)

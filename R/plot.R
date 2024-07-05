@@ -86,7 +86,11 @@ make_annotation_df <- function(df, variable, ...) {
     annotation_df
 }
 
-expansion <- 0.33
+expansion_x_left <- 0.1
+expansion_x_right <- 0.1
+expansion_y_left <- 0
+expansion_y_right <- 0
+
 point_size <- 0.02
 errorbar_width <- point_size*4
 
@@ -127,7 +131,10 @@ save_summ_plot <- function(plot, ratio, size_unit=5, ...) {
                        
 learning_plot <- function(
     data, group, direction="horizontal",
-    test=paired_t_test, map_signif_level=TRUE, y_limits=c(-1, 1), colors=NULL, starsize=15,
+    test=paired_t_test,
+    map_signif_level=TRUE,
+    y_limits=c(-1, 1),
+    colors=NULL, starsize=15,
     hjust_text=0.5,
     y_annotation=NULL,
     text_y_size=20,
@@ -180,7 +187,7 @@ learning_plot <- function(
     } else {
         stopifnot(length(colors)==length(unique(annotation_df$group__)))
         panel <- panel +
-            geom_line(data=annotation_df, aes(x=x, y=PI, col=group__, group=group__), size=2) +
+            geom_line(data=annotation_df, aes(x=x, y=PI, col=group__, group=group__), linewidth=2) +
             ggforce::geom_circle(data=annotation_df, color=NA, aes(fill=group__, r=point_size, x0=x, y0=PI, group=group__)) +
             scale_fill_manual(values=colors) +
             scale_color_manual(values=colors) + guides(fill="none", color="none")
@@ -189,12 +196,18 @@ learning_plot <- function(
     # 1.2
     from=floor(original_y_lim[1]*0.5)/0.5
     to=ceiling(original_y_lim[2]/0.5)*0.5
+
+
+    # 1.3
+    from=-1
+    to=1
+    y_limits <- c(-1, 1)
     
     panel <- panel +     
         # geom_point(data=annotation_df, aes(x=x, y=PI, group=group__), color="#ff6000", size=2) +
         geom_errorbar(data=annotation_df, aes(x=x, y=PI, ymin=PI-std_error, ymax=PI+std_error, color=group__, group=group__), width=errorbar_width) +
-        scale_y_continuous(breaks=seq(from=from,to=to, 0.5), limits=y_limits, expand=expansion(mult=y_mult)) +
-    scale_x_discrete(expand = expansion(mult = c(expansion, expansion))) + theme(axis.line.x=element_blank())
+        scale_y_continuous(breaks=seq(from=from,to=to, 0.5), limits=y_limits, expand=expansion(mult=c(expansion_y_left, expansion_y_right))) +
+    scale_x_discrete(expand = expansion(mult = c(expansion_x_left, expansion_x_right))) + theme(axis.line.x=element_blank())
     
     if (direction == "horizontal") {
         panel <- panel + facet_grid(. ~ group__)
@@ -203,7 +216,7 @@ learning_plot <- function(
     }
 
     panel <- panel + geom_text(data=annotation_df, y=y_limits[1]+0.15, size=textsize, x=1, hjust=hjust_text, mapping=aes(label = paste0("N = ", N/2)))
-
+    print(y_annotation)
     if (!is.null(test)) {
         if (map_signif_level) {
             panel <- panel + geom_signif(
@@ -233,24 +246,52 @@ learning_plot <- function(
         )
     
     data$group__ <- NULL
-    return(list(gg=panel, n_facets=n_facets, direction=direction))
+    return(list(gg=panel, n_facets=n_facets, direction=direction, annotation=annotation_df))
 }
                        
-                       
-summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t_test, map_signif_level=TRUE, colors=NULL, x_labels_angle=0, starsize=15, text_y_size=20, title_y_size=25, y_limits=NULL) {
 
-    y_mult <- c(0.02, 0.02)
+preprocess_summary_data <- function(data, group, test, value.var="PI") {
+    data$group__ <- data[[group]]
+    data$test__ <- data[[test]]
+    data <- dcast(data, id + group__ ~ test__, value.var=value.var)
+    data[[paste0("d", value.var)]] <- data$POST-data$PRE
+    data[[test]] <- data$test__
+    data[, test__ := NULL]
+    return(data)
+}
+
+                       
+summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t_test, map_signif_level=TRUE, colors=NULL, x_labels_angle=0, starsize=15, text_y_size=20, title_y_size=25, y_limits=NULL, percentile=c(0.025, 0.975), preprocess_function=preprocess_summary_data, y_axis_label="Δ PI", y_breaks=waiver()) {
 
     stopifnot(length(comparisons) == length(annotation_y))
-    data$group__ <- data[[group]]
-    data <- dcast(data, fly_name_reference + group__ ~ test, value.var="PI")
-    data[, PI := POST - PRE]
+    data <- preprocess_function(data=data, group=group, test="test", value.var="PI")
+
     if (!is.null(colors)) {
-        gg <- ggplot(data=data, aes(x=group__, y=PI, fill=group__))
+        gg <- ggplot(data=data, aes(x=group__, y=dPI, fill=group__))
     } else {
-        gg <- ggplot(data=data, aes(x=group__, y=PI))
+        gg <- ggplot(data=data, aes(x=group__, y=dPI))
     }
-    gg <- gg + geom_boxplot(size=1.5, fatten=0.75)
+    data_summ <- data[, .(
+        ymin=quantile(dPI, percentile[1]),
+        lower = quantile(dPI, 0.25),
+        middle = median(dPI),
+        upper = quantile(dPI, 0.75),
+        ymax = quantile(dPI, percentile[2])
+    ), by=group__
+    ]
+    data[, outlier := FALSE]
+    for (grp in data_summ$group__) {
+        data[group__ == grp & (dPI < data_summ[group__==grp, ymin] | dPI > data_summ[group__==grp, ymax]), outlier := TRUE]
+    }
+    print("Outliers: ")
+    print(data[outlier == TRUE,])
+    
+    thickness<-1.5
+    gg <- gg + 
+        geom_boxplot(data=data_summ, stat="identity", aes(x=group__, y=NULL, ymin = ymin, lower = lower, middle = middle, upper = upper, ymax = ymax), size=thickness, fatten=0.75) +
+        geom_segment(data=data_summ, aes(x = as.numeric(group__) - 0.25, xend = as.numeric(group__) + 0.25, y = ymin, yend = ymin), linewidth=thickness) +  # Lower whisker
+        geom_segment(data=data_summ, aes(x = as.numeric(group__) - 0.25, xend = as.numeric(group__) + 0.25, y = ymax, yend = ymax), linewidth=thickness) +  # Upper whisker
+        geom_jitter(data=data[outlier == TRUE,], aes(x=group__, y=dPI), width=0.1)
         # scale_y_continuous(breaks=seq(-1, 1, 0.5), limits=c(-1, 1)) +
     
     if (x_labels_angle == 0) {
@@ -264,9 +305,9 @@ summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t
     }
     
     if (is.null(y_limits)) {
-        gg <- gg + scale_y_continuous(name="Δ PI", expand=expansion(mult=y_mult))
+        gg <- gg + scale_y_continuous(name=y_axis_label, breaks=y_breaks, expand=expansion(mult=c(expansion_y_left, expansion_y_right)))
     } else {
-        gg <- gg + scale_y_continuous(name="Δ PI", expand=expansion(mult=y_mult), limits=y_limits)
+        gg <- gg + scale_y_continuous(name=y_axis_label, breaks=y_breaks, expand=expansion(mult=c(expansion_y_left, expansion_y_right)), limits=y_limits)
     }
     if (!is.null(colors)) {
         stopifnot(length(colors) == length(unique(data$group)))
@@ -274,9 +315,9 @@ summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t
     }
     gg <- gg + theme(
         axis.text.y = element_text(size=text_y_size),
-        axis.title.y = element_text(size=title_y_size),
-        
-        axis.text.x = element_text(hjust=1, vjust=1, angle=x_labels_angle))
+        axis.title.y = element_text(size=title_y_size),        
+        axis.text.x = element_text(hjust=1, vjust=1, angle=x_labels_angle)
+    )
     
     for (i in 1:length(comparisons)) {
         gg <- gg + geom_signif(
