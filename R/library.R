@@ -77,6 +77,10 @@ read_pi <- function(path, roi, min_exits=3) {
        pis[, appetitive := apetitive]
    }
    animal_data<-pis[region_id == roi,]
+   if(roi==3) {
+       print(path)
+       print(pis)
+   }
    if (nrow(animal_data)==0) {
        n_exits <- NA
        pi <- NA
@@ -89,7 +93,7 @@ read_pi <- function(path, roi, min_exits=3) {
        else if (n_exits < min_exits) {
            pi <- NA   
         } else {
-          pi <- pis[(region_id == roi), preference_index]
+          pi <- animal_data[, preference_index]
        }
     }
    return(list(pi=pi, n_exits=n_exits))
@@ -114,8 +118,8 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
             val
         })
     })
-    pi <- mean(sapply(results, function(x) {x$pi}), na.rm=TRUE)
-    n_exits <- sum(sapply(results, function(x) {x$n_exits}), na.rm=TRUE)
+    pi <- mean(sapply(results, function(x) {x$pi}), na.rm=FALSE)
+    n_exits <- sum(sapply(results, function(x) {x$n_exits}), na.rm=FALSE)
     files <- sapply(results, function(x) {x$file})
     out <- list(pi=pi, n_exits=n_exits, files=files)
     

@@ -102,7 +102,9 @@ unpaired_t_test <- function(x, y, ...) {
 paired_t_test <- function(x, y, ...) {
     t.test(x=x, y=y, alt="two.sided", paired=TRUE, ...)
 }
-                       
+paired_wilcoxon_test <- function(x, y, ...) {
+    wilcox.test(x=x, y=y, alt="two.sided", paired=TRUE, ...)
+}
 
 save_learning_plot <- function(plot, ratio, size_unit=5, ...) {
     if (plot$direction=="horizontal") {
@@ -131,7 +133,7 @@ save_summ_plot <- function(plot, ratio, size_unit=5, ...) {
                        
 learning_plot <- function(
     data, group, direction="horizontal",
-    test=paired_t_test,
+    test=paired_wilcoxon_test,
     map_signif_level=TRUE,
     y_limits=c(-1, 1),
     colors=NULL, starsize=15,
@@ -139,7 +141,9 @@ learning_plot <- function(
     y_annotation=NULL,
     text_y_size=20,
     title_y_size=25,
-    textsize=10) {
+    textsize=10,
+    y_step=0.5
+) {
 
     if (is.null(group)) df$group__ <- "A"
     else if (!(group %in% colnames(data))) {
@@ -169,6 +173,18 @@ learning_plot <- function(
     
     print(y_limits)
     n_facets <- length(unique(data$group__))
+
+    # 1.2
+    from=floor(original_y_lim[1]*0.5)/0.5
+    to=ceiling(original_y_lim[2]/0.5)*0.5
+
+
+    # 1.3
+    from=original_y_lim[1]
+    to=original_y_lim[2]
+    y_limits <- c(from, to)
+
+
     
     if (is.null(y_annotation)) {
         y_annotation <- y_limits[2]*0.9
@@ -193,20 +209,11 @@ learning_plot <- function(
             scale_color_manual(values=colors) + guides(fill="none", color="none")
     }
     
-    # 1.2
-    from=floor(original_y_lim[1]*0.5)/0.5
-    to=ceiling(original_y_lim[2]/0.5)*0.5
 
-
-    # 1.3
-    from=-1
-    to=1
-    y_limits <- c(-1, 1)
-    
     panel <- panel +     
         # geom_point(data=annotation_df, aes(x=x, y=PI, group=group__), color="#ff6000", size=2) +
         geom_errorbar(data=annotation_df, aes(x=x, y=PI, ymin=PI-std_error, ymax=PI+std_error, color=group__, group=group__), width=errorbar_width) +
-        scale_y_continuous(breaks=seq(from=from,to=to, 0.5), limits=y_limits, expand=expansion(mult=c(expansion_y_left, expansion_y_right))) +
+        scale_y_continuous(breaks=seq(from=from,to=to, y_step), limits=y_limits, expand=expansion(mult=c(expansion_y_left, expansion_y_right))) +
     scale_x_discrete(expand = expansion(mult = c(expansion_x_left, expansion_x_right))) + theme(axis.line.x=element_blank())
     
     if (direction == "horizontal") {
