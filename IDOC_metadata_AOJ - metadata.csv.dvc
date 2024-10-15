@@ -1,0 +1,5 @@
+outs:
+- md5: c742d6c4197cc505a68dac2f3bc1eda2
+  size: 92148
+  hash: md5
+  path: IDOC_metadata_AOJ - metadata.csv
