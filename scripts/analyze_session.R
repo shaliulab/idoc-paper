@@ -12,11 +12,19 @@ test <- args[3]
 print(args)
 
 
+script_name <- tryCatch(
+  scriptName::current_filename(),
+  error = function(e) {
+    "analyze_session.R"
+})
+
+message(paste0("Running ", script_name))
+
 src_file <- tryCatch(
   rstudioapi::getActiveDocumentContext()$path,
   error = function(e) {
     print(e)
-    file.path(getwd(), "script.R")
+    file.path(getwd(), script_name)
   })
 
 stopifnot(file.exists(src_file))
@@ -76,7 +84,7 @@ use_default_roi_centers <- function(working_directory, experiment_folder) {
     src_path,
     dest_path
   )
-  print(paste0(src_path, "-->", dest_path))
+  print(paste0(src_path, " --> ", dest_path))
 }
 
 machine_name <- get_machine_name(working_directory, experiment_folder)

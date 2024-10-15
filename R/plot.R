@@ -72,7 +72,9 @@ make_annotation_df <- function(df, variable, ...) {
     )
     annotation_df[[variable]] <- factor(values, levels=values)
     annotation_df$annotations <- ifelse(annotation_df$annotations == 0.001, "< 0.001", as.character(annotation_df$annotations))
-    annotation_df$N <- sapply(annotation_df[[variable]], function(val) {nrow(df[df[[variable]]==val,])})
+    # divide by two because each fly is represented twice (once for the pre and once for the post)
+    annotation_df$N <- sapply(annotation_df[[variable]], function(val) {nrow(df[df[[variable]]==val,])/2})
+                       
 
                        
     df$var__ <- df[[variable]]
@@ -222,7 +224,7 @@ learning_plot <- function(
         panel <- panel + facet_grid(group__ ~ .)
     }
 
-    panel <- panel + geom_text(data=annotation_df, y=y_limits[1]+0.15, size=textsize, x=1, hjust=hjust_text, mapping=aes(label = paste0("N = ", N/2)))
+    panel <- panel + geom_text(data=annotation_df, y=y_limits[1]+0.15, size=textsize, x=1, hjust=hjust_text, mapping=aes(label = paste0("N = ", N)))
     print(y_annotation)
     if (!is.null(test)) {
         if (map_signif_level) {

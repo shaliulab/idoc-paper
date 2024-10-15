@@ -16,10 +16,13 @@ load_sessions_v1 <- function(idoc_folder) {
 load_sessions_v2 <- function(idoc_folder) {
        sessions_file<-file.path(idoc_folder, "sessions.yaml")
        sessions <- yaml::read_yaml(sessions_file)
-       sessions$pre <- file.path(idoc_folder, sessions$pre)
-       # post_entry <- rev(grep(pattern="post", x=names(sessions), value=TRUE))[1]
-       post_entry <- grep(pattern="post", x=names(sessions), value=TRUE)[1]
+       # sessions$pre <- file.path(idoc_folder, sessions$pre)
+       # pre_entry <- grep(pattern="pre", x=names(sessions), value=TRUE)[1]
+       # sessions$pre <- file.path(idoc_folder, sessions[[pre_entry]])
+       pre_entry <- tail(grep(pattern="pre", x=names(sessions), value=TRUE), n=1)
     
+       sessions$pre <- file.path(idoc_folder, sessions[[pre_entry]])
+       post_entry <- grep(pattern="post", x=names(sessions), value=TRUE)[1]
        sessions$post <- file.path(idoc_folder, sessions[[post_entry]])
     
        return(sessions)
@@ -77,10 +80,6 @@ read_pi <- function(path, roi, min_exits=3) {
        pis[, appetitive := apetitive]
    }
    animal_data<-pis[region_id == roi,]
-   if(roi==3) {
-       print(path)
-       print(pis)
-   }
    if (nrow(animal_data)==0) {
        n_exits <- NA
        pi <- NA
@@ -101,7 +100,7 @@ read_pi <- function(path, roi, min_exits=3) {
 
 
 
-read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, trials, min_exits_per_trial=3, verbose=FALSE) {
+read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, trials, min_exits_per_trial=3, verbose=FALSE, use_incomplete_tests=TRUE) {
     results <- lapply(trials, function(trial) {
         tryCatch({
             path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial=trial, verbose=verbose)
@@ -118,8 +117,8 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
             val
         })
     })
-    pi <- mean(sapply(results, function(x) {x$pi}), na.rm=FALSE)
-    n_exits <- sum(sapply(results, function(x) {x$n_exits}), na.rm=FALSE)
+    pi <- mean(sapply(results, function(x) {x$pi}), na.rm=use_incomplete_tests)
+    n_exits <- sum(sapply(results, function(x) {x$n_exits}), na.rm=use_incomplete_tests)
     files <- sapply(results, function(x) {x$file})
     out <- list(pi=pi, n_exits=n_exits, files=files)
     
@@ -131,13 +130,13 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
     return(out)
 }
 
-load_idoc_data <- function(metadata, ncores=1, min_exits=3, trials=1:2, verbose=FALSE) {
+load_idoc_data <- function(metadata, ncores=1, min_exits=3, trials=1:2, ...) {
     data <- do.call(rbind, parallel::mclapply(1:nrow(metadata), function(i) {
        meta <- metadata[i, ]
        region_id <- meta$ROI
        sessions <- load_sessions_v2(meta$idoc_folder)
        for (test in c("PRE", "POST")) {
-           val <- read_pi_multitrial(sessions[[tolower(test)]], test, meta$idoc_folder, region_id, trials=trials, min_exits_per_trial=min_exits, verbose=verbose)
+           val <- read_pi_multitrial(sessions[[tolower(test)]], test, meta$idoc_folder, region_id, trials=trials, min_exits_per_trial=min_exits, ...)
            meta[[test]]<-val$pi
            meta[[paste0(test, "_n_exits")]]<-val$n_exits
            meta[[paste0(test, "_files")]] <- list(val$files)
