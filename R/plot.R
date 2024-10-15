@@ -186,8 +186,6 @@ learning_plot <- function(
     to=original_y_lim[2]
     y_limits <- c(from, to)
 
-
-    
     if (is.null(y_annotation)) {
         y_annotation <- y_limits[2]*0.9
     }
@@ -259,48 +257,66 @@ learning_plot <- function(
 }
                        
 
-preprocess_summary_data <- function(data, group, test, value.var="PI") {
+preprocess_summary_data_deltaPI <- function(data, group, test, value.var="PI") {
     data$group__ <- data[[group]]
     data$test__ <- data[[test]]
     data <- dcast(data, id + group__ ~ test__, value.var=value.var)
-    data[[paste0("d", value.var)]] <- data$POST-data$PRE
+    print(head(data))
+    data[[value.var]] <- data$POST-data$PRE
     data[[test]] <- data$test__
     data[, test__ := NULL]
     return(data)
 }
 
-                       
-summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t_test, map_signif_level=TRUE, colors=NULL, x_labels_angle=0, starsize=15, text_y_size=20, title_y_size=25, y_limits=NULL, percentile=c(0.025, 0.975), preprocess_function=preprocess_summary_data, y_axis_label="Δ PI", y_breaks=waiver()) {
+preprocess_summary_data_postPI <- function(data, group, test, value.var="PI") {
+    data$group__ <- data[[group]]
+    data$test__ <- data[[test]]
+    data <- data[test=="POST",]
+    data[[test]] <- data$test__
+    data[, test__ := NULL]
+    return(data)
+}
+                   
 
+                       
+summary_plot <- function(
+    data, group, comparisons, annotation_y, test=unpaired_t_test, map_signif_level=TRUE, colors=NULL, x_labels_angle=0, starsize=15,
+    text_y_size=20, title_y_size=25, y_limits=NULL, percentile=c(0.025, 0.975),
+    preprocess_function=preprocess_summary_data_postPI, y_axis_label="Post PI", y_breaks=waiver()
+) {
     stopifnot(length(comparisons) == length(annotation_y))
+    percentage<-1
+
     data <- preprocess_function(data=data, group=group, test="test", value.var="PI")
+    stopifnot("PI" %in% colnames(data))
+    data[, PI:=PI*percentage]
+    y_limits<-y_limits*percentage
+
 
     if (!is.null(colors)) {
-        gg <- ggplot(data=data, aes(x=group__, y=dPI, fill=group__))
+        gg <- ggplot(data=data, aes(x=group__, y=PI, fill=group__))
     } else {
-        gg <- ggplot(data=data, aes(x=group__, y=dPI))
+        gg <- ggplot(data=data, aes(x=group__, y=PI))
     }
     data_summ <- data[, .(
-        ymin=quantile(dPI, percentile[1]),
-        lower = quantile(dPI, 0.25),
-        middle = median(dPI),
-        upper = quantile(dPI, 0.75),
-        ymax = quantile(dPI, percentile[2])
+        ymin=quantile(PI, percentile[1]),
+        lower = quantile(PI, 0.25),
+        middle = median(PI),
+        upper = quantile(PI, 0.75),
+        ymax = quantile(PI, percentile[2])
     ), by=group__
     ]
     data[, outlier := FALSE]
     for (grp in data_summ$group__) {
-        data[group__ == grp & (dPI < data_summ[group__==grp, ymin] | dPI > data_summ[group__==grp, ymax]), outlier := TRUE]
+        data[group__ == grp & (PI < data_summ[group__==grp, ymin] | PI > data_summ[group__==grp, ymax]), outlier := TRUE]
     }
-    print("Outliers: ")
-    print(data[outlier == TRUE,])
     
     thickness<-1.5
     gg <- gg + 
         geom_boxplot(data=data_summ, stat="identity", aes(x=group__, y=NULL, ymin = ymin, lower = lower, middle = middle, upper = upper, ymax = ymax), size=thickness, fatten=0.75) +
         geom_segment(data=data_summ, aes(x = as.numeric(group__) - 0.25, xend = as.numeric(group__) + 0.25, y = ymin, yend = ymin), linewidth=thickness) +  # Lower whisker
         geom_segment(data=data_summ, aes(x = as.numeric(group__) - 0.25, xend = as.numeric(group__) + 0.25, y = ymax, yend = ymax), linewidth=thickness) +  # Upper whisker
-        geom_jitter(data=data[outlier == TRUE,], aes(x=group__, y=dPI), width=0.1)
+        geom_jitter(data=data[outlier == TRUE,], aes(x=group__, y=PI), width=0.1)
         # scale_y_continuous(breaks=seq(-1, 1, 0.5), limits=c(-1, 1)) +
     
     if (x_labels_angle == 0) {
@@ -319,7 +335,9 @@ summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t
         gg <- gg + scale_y_continuous(name=y_axis_label, breaks=y_breaks, expand=expansion(mult=c(expansion_y_left, expansion_y_right)), limits=y_limits)
     }
     if (!is.null(colors)) {
-        stopifnot(length(colors) == length(unique(data$group)))
+        if(! length(colors) == length(unique(data$group))) {
+            print(paste0(length(colors) != length(unique(data$group))))
+        }
         gg <- gg + scale_fill_manual(values=colors) + guides(fill="none")
     }
     gg <- gg + theme(
@@ -333,7 +351,7 @@ summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t
             textsize=starsize,
             size=2,
             comparisons=list(comparisons[[i]]),
-            y_position = annotation_y[i],
+            y_position = annotation_y[i]*percentage,
             map_signif_level=map_signif_level,
             test=test
         ) 
@@ -343,6 +361,7 @@ summary_plot <- function(data, group, comparisons, annotation_y, test=unpaired_t
     data$group__ <- NULL
     return(list(gg=gg, n_facets=n_facets))    
 }
+
                        
 
 preprocess_sleep_data <- function(data, group) {
