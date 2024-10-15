@@ -10,7 +10,7 @@ Stores the follwing resources:
 
 Note: .csv and .svg files are stored in a separate drive (Google) and can be downloaded using dvc (data version control). Assuming you have:
 
-1. dvc installed
+1. dvc version 3.55.2 is installed
 2. access permissions to the Google Drive folder (TODO)
 
 you can get these files by running
