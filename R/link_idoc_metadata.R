@@ -35,7 +35,8 @@ link_idoc_metadata <- function(metadata, result_dir, verbose=TRUE) {
     if (!("sheet" %in% colnames(metadata))) {
         metadata$sheet <- ""
     }
-    metadata <- data.table::copy(metadata[!is.na(ROI) & ROI!="NA",])
+    metadata <- data.table::copy(metadata[!is.na(PRE_ROI) & PRE_ROI!="NA",])
+    metadata <- data.table::copy(metadata[!is.na(POST_ROI) & POST_ROI!="NA",])
     metadata <- metadata[order(sheet, Files),]
     metadata[, folder__ := Files]
     metadata[, sheet__ := sheet]
@@ -44,7 +45,7 @@ link_idoc_metadata <- function(metadata, result_dir, verbose=TRUE) {
     
     metadata_unique <- metadata_unique[, link_idoc_file(.SD, result_dir=result_dir, verbose=verbose), by=.(Files, sheet)]
     metadata_linked <- merge(metadata, metadata_unique[, .(Files, sheet, idoc_folder)], by=c("Files", "sheet"))   
-    metadata_linked[, fly_name_reference := paste0(Files, "_ROI_", ROI)]
+    metadata_linked[, fly_name_reference := paste0(Files, "_ROI_", PRE_ROI)]
     
     return(metadata_linked)
 }

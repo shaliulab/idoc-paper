@@ -95,17 +95,49 @@ read_pi <- function(path, roi, min_exits=3) {
           pi <- animal_data[, preference_index]
        }
     }
-   return(list(pi=pi, n_exits=n_exits))
+   return(list(pi=pi, n_exits=n_exits, aversive=animal_data$aversive, appetitive=animal_data$appetitive))
 }
 
 
+average_trial <- function(results, min_exits_per_trial, use_incomplete_tests) {
+    pis <- sapply(results, function(x) {x$pi})
+    pi <- mean(pis, na.rm=use_incomplete_tests)
+    n_exits <- sum(sapply(results, function(x) {x$n_exits}), na.rm=use_incomplete_tests)
+    return(list(pi=pi, n_exits=n_exits))
+}
 
-read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, trials, min_exits_per_trial=3, verbose=FALSE, use_incomplete_tests=TRUE) {
+best_trial <- function(results, min_exits_per_trial, use_incomplete_tests) {
+    n_na_trials <- sum(sapply(results, function(x) {
+        is.na(x$pi)
+    }))
+
+    if (n_na_trials<2) {
+      pis <- sapply(results, function(x) {x$pi})
+      i <- which.min(pis)
+      pi <- pis[i]
+      n_exits <- sapply(results, function(x) {x$n_exits})[i]  
+    } else {
+        aversive <- sum(sapply(results, function(x) {ifelse(length(x$aversive)==0, 0, x$aversive)}))
+        appetitive <- sum(sapply(results, function(x) {ifelse(length(x$appetitive)==0, 0, x$appetitive)}))
+        n_exits <- aversive + appetitive
+        pi <- (appetitive - aversive)/n_exits
+    }
+
+    if (!use_incomplete_tests & n_exits < min_exits_per_trial) {
+        pi <- NA
+    }
+                                 
+                                
+    return(list(pi=pi, n_exits=n_exits))
+}
+
+read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, trials, min_exits_per_trial=3, verbose=FALSE, use_incomplete_tests=TRUE, summary_FUN=average_trial) {
     results <- lapply(trials, function(trial) {
         tryCatch({
             path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial=trial, verbose=verbose)
+            val <- list(pi=NA, n_exits=NA, file=NA, aversive=NA, appetitive=NA)
             if (is.null(path)) {
-                val <- list(file=NA, pi=NA, n_exits=NA)                
+                val
             } else {
                 val <- read_pi(path, region_id, min_exits=min_exits_per_trial)
                 val$file <- path
@@ -113,12 +145,13 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
             val
         }, error = function(error) {
             if (verbose) warning(error)
-            val <- list(pi=NA, n_exits=NA, file=NA)
             val
         })
     })
-    pi <- mean(sapply(results, function(x) {x$pi}), na.rm=use_incomplete_tests)
-    n_exits <- sum(sapply(results, function(x) {x$n_exits}), na.rm=use_incomplete_tests)
+
+    out <- summary_FUN[[test]](results, min_exits_per_trial=min_exits_per_trial, use_incomplete_tests=use_incomplete_tests)
+    pi<-out$pi
+    n_exits <- out$n_exits
     files <- sapply(results, function(x) {x$file})
     out <- list(pi=pi, n_exits=n_exits, files=files)
     
@@ -133,9 +166,10 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
 load_idoc_data <- function(metadata, ncores=1, min_exits=3, trials=1:2, ...) {
     data <- do.call(rbind, parallel::mclapply(1:nrow(metadata), function(i) {
        meta <- metadata[i, ]
-       region_id <- meta$ROI
        sessions <- load_sessions_v2(meta$idoc_folder)
        for (test in c("PRE", "POST")) {
+           region_id <- meta[[paste0(test, "_ROI")]]
+           stopifnot(!is.null(region_id))
            val <- read_pi_multitrial(sessions[[tolower(test)]], test, meta$idoc_folder, region_id, trials=trials, min_exits_per_trial=min_exits, ...)
            meta[[test]]<-val$pi
            meta[[paste0(test, "_n_exits")]]<-val$n_exits

@@ -1,0 +1,184 @@
+source("R/tests.R", local = T)
+source("R/utils.R", local = T)
+source("R/constants.R", local = T)
+source("R/Cbind.R", local = T)
+source("R/plot.R", local = T)
+source("R/themes.R", local = T)
+source("R/learning_plot.R", local = T)
+source("R/summary_plot.R", local = T)
+source("R/prism_compat.R", local = T)
+source("5_1_panel4_sleep_data.R")
+source("5_2_panel4_sleep_data.R")
+
+load_ethoscope_data_for_idoc_paper()
+
+experiments <- c("24hr LTM")
+trainings <- c("6X_Massed", "6X_Spaced")
+genotypes <- c("Iso31", "MB010B.(II)SPARC-Chrimson ISO", "MB010B.(II)SPARC-GFP ISO")
+intervals <- c("No_stimulator")
+valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
+periods <- list(
+  c(5, 11),
+  c(12, 18)
+)
+
+
+data <- data.table::fread(file = "tidy_data_wide.csv")
+
+panel4_data <- data[
+  PRE_Reason %in% valid_reasons &
+    POST_Reason %in% valid_reasons &
+    Training %in% trainings &
+    Genotype %in% genotypes &
+    interval %in% intervals &
+    experiment %in% experiments &
+    region_id != "NONE" &
+    substr(Files, 1, 4) == "2023",
+]
+
+panel4_data[, Training := factor(Training, levels = trainings)]
+
+columns <- c(
+  "Files", "idoc_folder", "PRE_ROI", "POST_ROI",
+  "User", "Genotype", "experiment",
+  "PRE", "POST", "SD_status", "interval"
+)
+export_csvs(panel4_data, "Training", trainings, "4A", columns)
+panel4_data_long <- melt_idoc_data(panel4_data)
+
+panel4A <- learning_plot(
+  data = panel4_data_long,
+  "Training",
+  y_annotation = .7,
+  y_annotation_n = -1,
+  y_limits = c(-1, 1),
+  text_vjust = +1.5,
+  test = paired_t_test,
+  textsize = 4,
+  colors = colors_panel4[1:length(trainings)]
+)
+
+sleep_dataset <- process_sleep_dataset(panel4_data, periods)
+sleep_data <- sleep_dataset$data
+significance_data <- sleep_dataset$significance
+sleep_accum <- sleep_dataset$periods
+
+breaks <- behavr::hours(seq(4, 24, 2))
+panel4C <- ggplot() +
+  geom_line(
+    data = sleep_data[t <= behavr::hours(24), ],
+    mapping = aes(x = t, y = mu, fill = Training, col = Training),
+    linewidth = 2
+  ) +
+  geom_point(
+    data = sleep_data[t <= behavr::hours(24), ],
+    aes(x = t, y = mu, fill = Training, col = Training)
+  ) +
+  scale_x_hours(
+    name = "ZT", breaks = breaks,
+    labels = (breaks %% behavr::hours(24)) / behavr::hours(1)
+  ) +
+  geom_errorbar(
+    data = sleep_data[t <= behavr::hours(24), ],
+    aes(x = t, fill = Training, col = Training, ymin = mu - sem, ymax = mu + sem),
+    linewidth = 1
+  ) +
+  scale_color_manual(values = colors_panel4[1:3]) +
+  scale_y_continuous(name = "Time asleep per\n30 min bin (min)", expand = expansion(add = c(0, 0))) +
+  geom_signif(
+    data = significance_data[winner == TRUE, ],
+    mapping = aes(
+      xmin = t - behavr::mins(15),
+      xmax = t + behavr::mins(15),
+      group = t,
+      annotations = symbol
+    ), hjust = 0,
+    segment_color = "white",
+    tip_length = 0, y_position = 20, manual = TRUE, textsize = 5, angle = 90
+  ) +
+  coord_cartesian(clip = "off", ylim = c(0, 30), xlim = behavr::hours(c(4, 24))) +
+  sleep_plot_theme
+
+panel4C <- list(gg = panel4C)
+
+
+all_levels <- c(trainings, "No_training")
+sleep_accum[, Training := factor(as.character(Training), levels = all_levels)]
+export_csvs(sleep_accum, "Training", all_levels, "4C", NULL, "asleep")
+
+
+
+preprocess_function <- function(data, group, test, value.var = "PI") {
+  data$group__ <- data[[group]]
+  data[[value.var]] <- data$asleep
+  return(data)
+}
+panel4D_all <- lapply(periods, function(period) {
+  period_str <- paste0(
+    "ZT",
+    stringr::str_pad(string = period[1], pad = "0", width = 2),
+    "-ZT",
+    stringr::str_pad(string = period[2], pad = "0", width = 2)
+  )
+  print(period_str)
+
+  panel <- summary_plot(
+    data = sleep_accum[
+      interval == period_str,
+    ],
+    group = "Training",
+    comparisons = list(
+      c("6X_Massed", "6X_Spaced"),
+      c("No_training", "6X_Spaced"),
+      c("No_training", "6X_Massed")
+    ),
+    map_signif_level = T,
+    annotation_y = c(275, 255, 305) + 80,
+    test = unpaired_t_test,
+    colors = colors_panel4[1:3],
+    y_limits = c(0, 360),
+    percentile = c(0.025, 0.975),
+    preprocess_function = preprocess_function,
+    y_axis_label = paste0(period_str, " sleep (min)"),
+    y_breaks = seq(0, 360, 60),
+    geom = "violin+sina",
+    text_hjust = 1,
+    text_vjust = 2.5,
+    textsize = 4,
+    angle_n = 45,
+    starsize = 2.5
+  )
+
+  panel$gg <- panel$gg +
+    scale_color_manual(
+      values = colors_panel4[1:3],
+      labels = all_levels
+    ) +
+    guides(color = guide_legend(override.aes = list(
+      linetype = 1, # Set line type to solid
+      shape = 15, # Remove points from the legend
+      size = 10
+    ))) + guides(fill = "none")
+  panel
+})
+
+layout <- "AAADDEE
+            BBCCCCC
+            "
+gg <- ggplot() +
+  learning_plot_theme +
+  panel4A$gg +
+  guides(color = "none", fill = "none") +
+  panel4C$gg +
+  guides(color = "none", fill = "none") +
+  panel4D_all[[1]]$gg +
+  guides(color = "none", fill = "none") +
+  panel4D_all[[2]]$gg +
+  guides(color = "none", fill = "none") +
+  plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E")), tag_suffix = " ") +
+  plot_layout(design = layout, heights = c(1, 1.5)) &
+  theme(legend.position = "bottom")
+
+
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.pdf"), width = 210, height = 180, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.svg"), width = 210, height = 180, unit = "mm")

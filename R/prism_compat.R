@@ -11,13 +11,10 @@ add_ghost_data <- function(dt, id, x, columns, group, to_wide=TRUE) {
     groups <- levels(group_size$group__)
     # group_size$group__<-factor(group_size$group__, levels=groups)
     group_size<-group_size[order(group__),]
-    
-    print(group_size)
-    
+   
     time_index <- data.table(x=index)
     for (group in groups) {
         diff <- group_size[group__ == group, diff]
-        print(length(diff))
 
         if (length(diff)>0 && diff > 0) {
             for (i in 1:diff) {
@@ -35,7 +32,6 @@ add_ghost_data <- function(dt, id, x, columns, group, to_wide=TRUE) {
     }
     
     if (to_wide) {
-        print(groups)
         l <- lapply(groups, function(group) {
             out <- dcast(
                 dt[group__ == group, ][, c(id, "x", "group__", columns), with=FALSE],
