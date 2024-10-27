@@ -60,7 +60,6 @@ panel2B <- summary_plot(
   ),
   map_signif_level = T,
   annotation_y = c(0.85, 0.65),
-  test = unpaired_t_test,
   colors = colors_panel2[1:length(experiments)],
   y_limits = c(-1, 1),
   percentile = c(0.025, 0.975),
@@ -75,7 +74,7 @@ panel2B <- summary_plot(
 panelA <- panel2A$gg + guides(color = "none", fill = "none")
 panelB <- panel2B$gg + guides(color = "none", fill = "none")
 design <- "
-  AAAAAABBCC
+  AAAAABBBCCC
 "
 gg <- ggplot() +
   learning_plot_theme +

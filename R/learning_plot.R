@@ -5,9 +5,17 @@ library(data.table)
 library(ggplot2)
 library(ggsignif)
 
+#' @param data Data frame with columns:
+#' * PI: numeric from -1 to 1
+#' * test: one of PRE or POST
+#' * id: unique to each animal. The same animal must have one PRE and one POST value,
+#'     and no more
+#' * a column named according to the input argument 'group', used to separate
+#'     animals by some category e.g. genotype, treatment, etc
+#'  @param group A column in the data frame data, see argument data 
 learning_plot <- function(
     data, group, direction = "horizontal",
-    test = paired_wilcoxon_test,
+    test = paired_t_test,
     map_signif_level = TRUE,
     y_limits = c(-1, 1),
     colors = NULL,
@@ -44,26 +52,27 @@ learning_plot <- function(
 
   group <- "group__"
 
-  annotation_df <- make_annotation_df(data, group, alternative = "greater")
+  annotation_df <- make_annotation_df(df = data, variable = group, test = test, alt = "greater")
   data$x <- ifelse(data$test == "PRE", 1, 2)
   annotation_df$x <- ifelse(annotation_df$test == "PRE", 1, 2)
   n_facets <- length(unique(data$group__))
 
-  panel <- ggplot(data = data, aes(x = x, y = PI, group = group__)) +
-    # ggforce::geom_circle(
-    #   fill = distribution_color, color = NA,
-    #   aes(r = point_size, x0 = x, y0 = PI)
-    # ) +
+  panel <- ggplot(data = data, aes(x = x, y = PI)) +
     geom_point(
-      size = point_size, color = distribution_color,
-      mapping = aes(x = x, y = PI)
+      size = point_size,
+      color = distribution_color
     ) +
     geom_line(
       aes(group = id),
       color = distribution_color,
       linewidth = linewidth
     )
-  panel <- add_trend_geom(panel, annotation_df, colors, point_size = point_size_mean, linewidth = linewidth_mean, ERRORBAR_WIDTH)
+  panel <- add_trend_geom(
+    panel, annotation_df, colors,
+    point_size = point_size_mean,
+    linewidth = linewidth_mean,
+    ERRORBAR_WIDTH
+  )
   panel <- add_n_annotation(
     panel, annotation_df,
     text_vjust = text_vjust,
@@ -78,9 +87,14 @@ learning_plot <- function(
   panel <- panel + scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0)))
 
   if (!is.null(test)) {
-    panel <- add_significance_marks(
-      panel, test, annotation_df, y_annotation, vjust, starsize, map_signif_level, family
-    )
+    panel <- tryCatch({
+      add_significance_marks(
+        panel, test, annotation_df, y_annotation, vjust, starsize, map_signif_level, family
+      )},
+      error = function(e) {
+        print(e)
+        return(panel)
+    })
   }
 
   panel <- panel + coord_cartesian(clip = "off", ylim = y_limits) + learning_plot_theme
@@ -119,23 +133,32 @@ add_trend_geom <- function(
     panel <- panel +
       geom_line(
         data = annotation_df,
-        aes(x = x, y = PI, group = group__),
-        color = "#ff6000", linewidth = linewidth
+        aes(
+          x = x, y = PI,
+          color = group__,
+          group = group__
+        ),
+        linewidth = linewidth
       ) +
       geom_point(
-        color = "#ff6000", size = point_size,
-        mapping = aes(x = x, y = PI, group = group__)
+        data = annotation_df,
+        mapping = aes(
+          x = x, y = PI,
+          color = group__,
+          group = group__
+        ),
+        size = point_size
       )
-    # ggforce::geom_circle(
-    #   data = annotation_df, fill = "#ff6000", color = NA,
-    #   aes(r = point_size_mean, x0 = x, y0 = PI, group = group__)
-    # )
   } else {
     stopifnot(length(colors) == length(unique(annotation_df$group__)))
     panel <- panel +
       geom_line(
         data = annotation_df,
-        aes(x = x, y = PI, col = group__, group = group__),
+        aes(
+          x = x, y = PI,
+          col = group__,
+          group = group__
+        ),
         linewidth = linewidth
       ) +
       geom_point(
@@ -143,7 +166,8 @@ add_trend_geom <- function(
         size = point_size,
         mapping = aes(
           color = group__,
-          x = x, y = PI, group = group__
+          x = x, y = PI,
+          group = group__
         )
       ) +
       # ggforce::geom_circle(

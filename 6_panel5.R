@@ -25,6 +25,7 @@ panel5_data <- data[
     Training == "6X_Spaced" &
     substr(Files, 1, 4) == "2023",
 ]
+panel5_data[, interval := factor(interval, levels=intervals)]
 
 columns <- c(
   "Files", "idoc_folder", "PRE_ROI", "POST_ROI", "User",
@@ -35,7 +36,6 @@ columns <- c(
 export_csvs(panel5_data, "interval", intervals, 5, columns)
 
 panel5_data_long <- melt_idoc_data(panel5_data)
-
 panel5A <- learning_plot(
   panel5_data_long, "interval",
   map_signif_level = TRUE,
@@ -43,7 +43,8 @@ panel5A <- learning_plot(
   colors = colors_panel5[1:length(intervals)],
   y_annotation = 1.1,
   y_limits = c(-1, 1),
-  text_vjust = 1.5,
+  text_hjust = 1,
+  text_vjust = 2.5,
   textsize = 3
 )
 panel5B <- summary_plot(
@@ -56,7 +57,6 @@ panel5B <- summary_plot(
   colors = colors_panel5[1:length(intervals)],
   y_limits = c(-1, 1),
   percentile = c(0.025, 0.975),
-  preprocess_function = preprocess_summary_data_postPI,
   map_signif_level = T,
   geom = "violin+sina",
   textsize = 3,
@@ -69,7 +69,7 @@ gg <- plot_spacer() + plot_spacer() + plot_spacer() + ggplot() + learning_plot_t
   scale_fill_manual(values = colors_panel5, labels = c("No stimulator", "ZT05-ZT11")) +
   (panel5B$gg + guides(color = "none", fill = "none")) + plot_spacer() + plot_spacer() + plot_spacer() +
   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
-  plot_layout(nrow = 3, heights = c(.2, 1, .2), widths = c(1, .5, .4), guides = "collect") &
+  plot_layout(nrow = 3, heights = c(.2, 1, .2), widths = c(1.2, .4, .4), guides = "collect") &
   theme(legend.position = "none")
 
 gg

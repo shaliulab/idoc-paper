@@ -24,6 +24,8 @@ NS_6x_massed <- "#A5402D"
 no_training <- "black"
 paired <- "blue"
 unpaired <- "red"
+dunce <- "green"
+orco <- "brown"
 stm_20min <- "blue"
 stm_1hr <- "#90be6d"
 stm_3hr <- "#277da1"
@@ -32,7 +34,7 @@ orb2_6x_spaced <- "#2667ff"
 orb2_20min <- "#add7f6"
 zt05_11_sd <- "#61a119"
 
-colors_panel1 <- c(paired, unpaired)
+colors_panel1 <- c(paired, unpaired, dunce, orco)
 colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr)
 colors_panel3 <- c(NS_6x_spaced, NS_6X_spaced_cxm, orb2_6x_spaced, orb2_20min)
 colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, no_training)
@@ -48,16 +50,13 @@ LINEWIDTH <- .8
 
 width <- dev.size("cm")[1] * 10
 
-POINT_SIZE <- width * 0.01
+POINT_SIZE <- width * 0.008
 ERRORBAR_WIDTH <- .1
-POINT_SIZE_MEAN <- width * 0.02
+POINT_SIZE_MEAN <- width * 0.012
 print(POINT_SIZE)
 print(POINT_SIZE_MEAN)
 
 
-# POINT_SIZE <- 0.03
-# ERRORBAR_WIDTH <- POINT_SIZE * 4
-# POINT_SIZE_MEAN <- 0.05
 LINEWIDTH_MEAN <- 1.2
 VJUST <- 0
 SUMMARY_PLOT_POINT_SIZE <- 2

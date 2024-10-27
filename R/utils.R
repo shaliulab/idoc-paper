@@ -1,25 +1,24 @@
 library(data.table)
 library(ggplot2)
 
-make_annotation_df <- function(df, variable, ...) {
-  var__ <- std_error <- PI_std <- N <- test <- PI <- . <- NULL
+make_annotation_df <- function(df, variable, test, ...) {
+  var__ <- std_error <- PI_std <- N <- PI <- . <- NULL
 
   values <- levels(df[[variable]])
   if (is.null(values)) {
     values <- unique(df[[variable]])
   }
+  min_n_points <- 2
 
   test_out <- lapply(values, function(val) {
     x <- df[df[[variable]] == val & test == "PRE", PI]
     y <- df[df[[variable]] == val & test == "POST", PI]
-    if (length(x) == 0) {
+    if (length(x) < min_n_points | is.null(test)) {
       return(list(p.value = NA, estimate = NA))
     }
-    t.test(
+    test(
       x = x,
       y = y,
-      paired = TRUE,
-      alt = "greater",
       ...
     )
   })

@@ -6,7 +6,7 @@ sleep_plot_theme <- theme_prism() + theme(
   axis.title = element_text(size = TITLE_SIZE),
   axis.text.y = element_text(size = TEXT_SIZE),
   strip.text = element_blank(),
-  plot.tag = element_text(size = PLOT_TAG_SIZE),
+  plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +13),
   legend.key.width = unit(1, "null"),
   legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE)
 )

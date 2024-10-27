@@ -6,8 +6,34 @@ library(ggplot2)
 library(ggsignif)
 
 
+preprocess_summary_data_deltaPI <- function(data, group, test, value.var = "PI") {
+  test__ <- NULL
+  data$group__ <- data[[group]]
+  data$test__ <- data[[test]]
+  data <- dcast(data, id + group__ ~ test__, value.var = value.var)
+  data[[value.var]] <- data$POST - data$PRE
+  return(data)
+}
+
+preprocess_summary_data_postPI <- function(data, group, test, value.var = "PI") {
+  test__ <- NULL
+  data$group__ <- data[[group]]
+  data$test__ <- data[[test]]
+  data <- data[test == "POST", ]
+  data[[test]] <- data$test__
+  data[, test__ := NULL]
+  return(data)
+}
+
+preprocess_function_default <- preprocess_summary_data_postPI
+y_axis_label_default <- "Post PI"
+
+# preprocess_function_default <- preprocess_summary_data_deltaPI
+# y_axis_label_default <- "ΔPI"
+
 summary_plot <- function(
-    data, group, comparisons, annotation_y,
+    data, group, comparisons,
+    annotation_y,
     test = unpaired_t_test,
     map_signif_level = TRUE,
     colors = NULL,
@@ -15,8 +41,8 @@ summary_plot <- function(
     starsize = STARSIZE,
     y_limits = NULL,
     percentile = c(0.025, 0.975),
-    preprocess_function = preprocess_summary_data_postPI,
-    y_axis_label = "Post PI",
+    preprocess_function = preprocess_function_default,
+    y_axis_label = y_axis_label_default,
     expansion_y_top = EXPANSION_Y_TOP,
     expansion_y_bottom = EXPANSION_Y_BOTTOM,
     y_breaks = waiver(),
@@ -67,8 +93,15 @@ summary_plot <- function(
   } else if (geom == "sina") {
     gg <- gg + ggforce::geom_sina(data = data, aes(x = group__, y = PI, col = group__), size = point_size)
   } else if (geom == "violin+sina") {
+    median_data <- data[, .(PI = mean(PI)), by=group__]
     gg <- gg + geom_violin(data = data, aes(x = group__, y = PI), fill = NA, col = "black") +
-      ggforce::geom_sina(data = data, aes(x = group__, y = PI, col = group__), size = point_size)
+    ggforce::geom_sina(data = data, aes(x = group__, y = PI, col = group__), size = point_size) +
+    geom_segment(
+      data = median_data,
+      mapping = aes(x=as.numeric(group__)-0.2, xend = as.numeric(group__)+0.2, y=PI),
+      linewidth = 2, alpha=0.7
+    )
+    
   }
   if (!is.null(colors)) {
     if (!length(colors) == length(unique(data$group))) {
@@ -104,22 +137,29 @@ summary_plot <- function(
 
   for (i in seq_along(comparisons)) {
     comparison <- comparisons[[i]]
-    gg <- gg + geom_signif(
-      comparisons = list(comparison),
-      y_position = annotation_y[i],
-      map_signif_level = map_signif_level,
-      tip_length = 0,
-      test = test,
-      family = family,
-      vjust = vjust,
-      textsize = starsize,
-      size = 1
-    )
-    test_out <- test(
-      data[group__ == comparison[1], PI],
-      data[group__ == comparison[2], PI],
-      alternative = "greater"
-    )
+    
+    n1 <- data_summ[group__ == comparison[1], N]
+    n2 <- data_summ[group__ == comparison[2], N]
+    if (n1 > 2 & n2 > 2) {
+      gg <- gg + geom_signif(
+        comparisons = list(comparison),
+        y_position = annotation_y[i],
+        map_signif_level = map_signif_level,
+        tip_length = 0,
+        test = test,
+        family = family,
+        vjust = vjust,
+        textsize = starsize,
+        size = 1
+      )
+      test_out <- test(
+        data[group__ == comparison[1], PI],
+        data[group__ == comparison[2], PI],
+        alternative = "greater"
+      )
+    } else {
+      test_out <- list(p.value = NA, estimate = NA)
+    }
     print(paste0(
       "Comparison ", paste(comparison, collapse = " vs "),
       " P value: ", test_out$p.value,
@@ -143,27 +183,3 @@ save_summ_plot <- function(plot, ratio, size_unit = 5, ...) {
   dev.off()
 }
 
-
-
-preprocess_summary_data_deltaPI <- function(data, group, test, value.var = "PI") {
-  test__ <- NULL
-
-  data$group__ <- data[[group]]
-  data$test__ <- data[[test]]
-  data <- dcast(data, id + group__ ~ test__, value.var = value.var)
-  data[[value.var]] <- data$POST - data$PRE
-  data[[test]] <- data$test__
-  data[, test__ := NULL]
-  return(data)
-}
-
-preprocess_summary_data_postPI <- function(data, group, test, value.var = "PI") {
-  test__ <- NULL
-
-  data$group__ <- data[[group]]
-  data$test__ <- data[[test]]
-  data <- data[test == "POST", ]
-  data[[test]] <- data$test__
-  data[, test__ := NULL]
-  return(data)
-}

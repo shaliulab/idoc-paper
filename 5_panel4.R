@@ -52,8 +52,8 @@ panel4A <- learning_plot(
   y_annotation = .7,
   y_annotation_n = -1,
   y_limits = c(-1, 1),
-  text_vjust = +1.5,
-  test = paired_t_test,
+  text_vjust = +2.5,
+  text_hjust = 1,
   textsize = 4,
   colors = colors_panel4[1:length(trainings)]
 )
@@ -134,7 +134,6 @@ panel4D_all <- lapply(periods, function(period) {
     ),
     map_signif_level = T,
     annotation_y = c(275, 255, 305) + 80,
-    test = unpaired_t_test,
     colors = colors_panel4[1:3],
     y_limits = c(0, 360),
     percentile = c(0.025, 0.975),
@@ -143,7 +142,7 @@ panel4D_all <- lapply(periods, function(period) {
     y_breaks = seq(0, 360, 60),
     geom = "violin+sina",
     text_hjust = 1,
-    text_vjust = 2.5,
+    text_vjust = 1.5,
     textsize = 4,
     angle_n = 45,
     starsize = 2.5
@@ -179,6 +178,6 @@ gg <- ggplot() +
   plot_layout(design = layout, heights = c(1, 1.5)) &
   theme(legend.position = "bottom")
 
-
+gg
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.pdf"), width = 210, height = 180, unit = "mm")
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.svg"), width = 210, height = 180, unit = "mm")
