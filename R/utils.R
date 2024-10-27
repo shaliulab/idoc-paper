@@ -2,7 +2,6 @@ library(data.table)
 library(ggplot2)
 
 make_annotation_df <- function(df, variable, ...) {
-
   var__ <- std_error <- PI_std <- N <- test <- PI <- . <- NULL
 
   values <- levels(df[[variable]])
@@ -77,32 +76,32 @@ make_annotation_df <- function(df, variable, ...) {
   annotation_df
 }
 
-add_n_annotation <- function(panel, annotation_df, x_annotation=NULL, y_annotation=-Inf, text_vjust = 0, text_hjust = 0, textsize = TEXT_SIZE, family = FONT, angle = 0) {
-  if(!is.null(x_annotation)) {
-  panel <- panel +
-    geom_text(
-      data = annotation_df, y = y_annotation, size = textsize, angle=angle,
-      family = family, hjust = text_hjust, vjust = text_vjust,
-      mapping = aes(label = paste0("n = ", N)),
-      x = x_annotation
-    )
+add_n_annotation <- function(panel, annotation_df, x_annotation = NULL, y_annotation = -Inf, text_vjust = 0, text_hjust = 0, textsize = TEXT_SIZE, family = FONT, angle = 0) {
+  if (!is.null(x_annotation)) {
+    panel <- panel +
+      geom_text(
+        data = annotation_df, y = y_annotation, size = textsize, angle = angle,
+        family = family, hjust = text_hjust, vjust = text_vjust,
+        mapping = aes(label = paste0("n = ", N)),
+        x = x_annotation
+      )
   } else {
-  panel <- panel +
-    geom_text(
-      data = annotation_df, y = y_annotation, size = textsize, angle=angle,
-      family = family, hjust = text_hjust, vjust = text_vjust,
-      mapping = aes(label = paste0("n = ", N), x_annotation=group__),
-    )
+    panel <- panel +
+      geom_text(
+        data = annotation_df, y = y_annotation, size = textsize, angle = angle,
+        family = family, hjust = text_hjust, vjust = text_vjust,
+        mapping = aes(label = paste0("n = ", N), x_annotation = group__),
+      )
   }
   return(panel)
 }
 
 
-export_csvs <- function(panel_data, grouping_column, groups, figure_count, columns, y_column="POST") {
+export_csvs <- function(panel_data, grouping_column, groups, figure_count, columns, y_column = "POST") {
   y_columns <- list()
   available_groups <- c()
   panel_data[["group__"]] <- panel_data[[grouping_column]]
-    
+
   for (group in groups) {
     panel_data_subset <- panel_data[
       group__ == group,
@@ -124,13 +123,13 @@ export_csvs <- function(panel_data, grouping_column, groups, figure_count, colum
     available_groups <- c(available_groups, group)
     y_columns <- c(y_columns, list(panel_data_subset[[y_column]]))
   }
-  
+
   y_columns <- Reduce(Cbind, y_columns)
   colnames(y_columns) <- available_groups
   out <- paste0(OUTPUT_FOLDER, "/Fig", substr(figure_count, 1, 1), "/Figure_", figure_count, "_boxplot.csv")
   message(out)
   data.table::fwrite(x = y_columns, file = out, quote = TRUE)
-} 
+}
 
 
 

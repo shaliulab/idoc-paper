@@ -34,7 +34,9 @@ panel2A <- learning_plot(
   map_signif_level = TRUE,
   y_annotation = 0.75,
   textsize = 4,
-  text_vjust = 1.5
+  angle_n = 45,
+  text_vjust = 1.5,
+  text_hjust = 1
 )
 
 ref_pi <- panel2A$annotation[test == "POST" & group__ == "20min STM", PI]
@@ -72,13 +74,19 @@ panel2B <- summary_plot(
 
 panelA <- panel2A$gg + guides(color = "none", fill = "none")
 panelB <- panel2B$gg + guides(color = "none", fill = "none")
-design <- "AAAAAABBCC"
+design <- "
+  AAAAAABBCC
+"
 gg <- ggplot() +
   learning_plot_theme +
   panelA +
   panelB +
+  plot_spacer() +
+  plot_spacer() +
+  plot_spacer() +
   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
-  plot_layout(design = design)
+  plot_layout(design = design) &
+  theme(plot.margin = unit(c(0,0,20,0), "pt"))
 gg
 
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig2/Figure_2.pdf"), width = 190, height = 100, unit = "mm")

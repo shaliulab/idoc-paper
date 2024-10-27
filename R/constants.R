@@ -48,9 +48,9 @@ LINEWIDTH <- .8
 
 width <- dev.size("cm")[1] * 10
 
-POINT_SIZE <- width*0.01
+POINT_SIZE <- width * 0.01
 ERRORBAR_WIDTH <- .1
-POINT_SIZE_MEAN <- width*0.02
+POINT_SIZE_MEAN <- width * 0.02
 print(POINT_SIZE)
 print(POINT_SIZE_MEAN)
 
@@ -62,12 +62,10 @@ LINEWIDTH_MEAN <- 1.2
 VJUST <- 0
 SUMMARY_PLOT_POINT_SIZE <- 2
 
-OUTPUT_FOLDER <- "output/2024-10-26"
+OUTPUT_FOLDER <- "figures/2024-10-27"
 dir.create(OUTPUT_FOLDER, recursive = TRUE)
 dir.create(file.path(OUTPUT_FOLDER, "Fig1"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig2"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig3"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig4"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig5"))
-
-

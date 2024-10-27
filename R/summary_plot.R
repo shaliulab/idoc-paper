@@ -28,9 +28,7 @@ summary_plot <- function(
     text_hjust = 0.5,
     text_vjust = 0,
     y_annotation_n = -1,
-    angle_n = 0
-  ) {
-
+    angle_n = 0) {
   PI <- group__ <- . <- outlier <- N <- NULL
   stopifnot(length(comparisons) == length(annotation_y))
 
@@ -148,7 +146,6 @@ save_summ_plot <- function(plot, ratio, size_unit = 5, ...) {
 
 
 preprocess_summary_data_deltaPI <- function(data, group, test, value.var = "PI") {
-
   test__ <- NULL
 
   data$group__ <- data[[group]]
@@ -161,7 +158,6 @@ preprocess_summary_data_deltaPI <- function(data, group, test, value.var = "PI")
 }
 
 preprocess_summary_data_postPI <- function(data, group, test, value.var = "PI") {
-
   test__ <- NULL
 
   data$group__ <- data[[group]]

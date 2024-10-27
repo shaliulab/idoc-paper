@@ -30,8 +30,8 @@ learning_plot <- function(
     point_size_mean = POINT_SIZE_MEAN,
     family = FONT,
     vjust = VJUST,
-    text_vjust = 0
-  ) {
+    angle_n = 45,
+    text_vjust = 0) {
   if (is.null(group)) {
     df$group__ <- "A"
   } else if (!(group %in% colnames(data))) {
@@ -57,7 +57,7 @@ learning_plot <- function(
     geom_point(
       size = point_size, color = distribution_color,
       mapping = aes(x = x, y = PI)
-    )  +
+    ) +
     geom_line(
       aes(group = id),
       color = distribution_color,
@@ -71,14 +71,17 @@ learning_plot <- function(
     textsize = textsize,
     family = family,
     x_annotation = x_annotation,
-    y_annotation = y_annotation_n
+    y_annotation = y_annotation_n,
+    angle = angle_n
   )
   panel <- add_facet(panel, direction)
   panel <- panel + scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0)))
 
-  if (!is.null(test)) panel <- add_significance_marks(
-    panel, test, annotation_df, y_annotation, vjust, starsize, map_signif_level, family
-  )
+  if (!is.null(test)) {
+    panel <- add_significance_marks(
+      panel, test, annotation_df, y_annotation, vjust, starsize, map_signif_level, family
+    )
+  }
 
   panel <- panel + coord_cartesian(clip = "off", ylim = y_limits) + learning_plot_theme
 
@@ -106,13 +109,11 @@ save_learning_plot <- function(plot, ratio, size_unit = 5, ...) {
 }
 
 add_trend_geom <- function(
-  panel, annotation_df, colors,
-  point_size = POINT_SIZE_MEAN,
-  linewidth = LINEWIDTH_MEAN,
-  errorbar_width = ERRORBAR_WIDTH
-  ) {
-
-    std_error <- group__ <- x <- PI <- NULL
+    panel, annotation_df, colors,
+    point_size = POINT_SIZE_MEAN,
+    linewidth = LINEWIDTH_MEAN,
+    errorbar_width = ERRORBAR_WIDTH) {
+  std_error <- group__ <- x <- PI <- NULL
 
   if (is.null(colors)) {
     panel <- panel +
@@ -125,10 +126,10 @@ add_trend_geom <- function(
         color = "#ff6000", size = point_size,
         mapping = aes(x = x, y = PI, group = group__)
       )
-      # ggforce::geom_circle(
-      #   data = annotation_df, fill = "#ff6000", color = NA,
-      #   aes(r = point_size_mean, x0 = x, y0 = PI, group = group__)
-      # )
+    # ggforce::geom_circle(
+    #   data = annotation_df, fill = "#ff6000", color = NA,
+    #   aes(r = point_size_mean, x0 = x, y0 = PI, group = group__)
+    # )
   } else {
     stopifnot(length(colors) == length(unique(annotation_df$group__)))
     panel <- panel +
@@ -171,7 +172,6 @@ add_trend_geom <- function(
 }
 
 add_significance_marks <- function(panel, test, annotation_df, y_annotation, vjust, textsize, map_signif_level, family) {
-
   group__ <- estimate <- p <- NULL
 
   if (map_signif_level) {
@@ -194,9 +194,9 @@ add_significance_marks <- function(panel, test, annotation_df, y_annotation, vju
   }
 
   for (group in unique(annotation_df$group__)) {
-    p <- annotation_df[group__==group, p]
-    estimate <- annotation_df[group__==group, estimate][1]
-    
+    p <- annotation_df[group__ == group, p]
+    estimate <- annotation_df[group__ == group, estimate][1]
+
     print(paste0(
       "Group ", group, " P value: ", p,
       " Effect size: ", estimate

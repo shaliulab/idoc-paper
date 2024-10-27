@@ -16,7 +16,8 @@ script_name <- tryCatch(
   scriptName::current_filename(),
   error = function(e) {
     "analyze_session.R"
-})
+  }
+)
 
 message(paste0("Running ", script_name))
 
@@ -25,7 +26,8 @@ src_file <- tryCatch(
   error = function(e) {
     print(e)
     file.path(getwd(), script_name)
-  })
+  }
+)
 
 stopifnot(file.exists(src_file))
 
@@ -50,14 +52,13 @@ write_analysis_params <- function(machine_name) {
     )
   )
   config <- configs[[machine_name]]
-  yaml::write_yaml(x=config, file="analysis_params.yaml")
-
+  yaml::write_yaml(x = config, file = "analysis_params.yaml")
 }
 
 get_suffix <- function(working_directory, experiment_folder) {
   experiment_dir <- file.path(working_directory, experiment_folder)
-  meta_file <- grep(x=list.files(experiment_dir), pattern = "METADATA.csv", value=TRUE)
-  stopifnot(length(meta_file)==1)
+  meta_file <- grep(x = list.files(experiment_dir), pattern = "METADATA.csv", value = TRUE)
+  stopifnot(length(meta_file) == 1)
   suffix <- substr(meta_file, 21, 52)
   return(suffix)
 }
@@ -73,7 +74,6 @@ get_machine_name <- function(working_directory, experiment_folder) {
 }
 
 use_default_roi_centers <- function(working_directory, experiment_folder) {
-  
   suffix <- get_suffix(working_directory, experiment_folder)
   experiment_dir <- file.path(working_directory, experiment_folder)
   dest_path <- file.path(experiment_dir, paste0(experiment_folder, "_", suffix, "_ROI_CENTER.csv"))
@@ -90,16 +90,16 @@ use_default_roi_centers <- function(working_directory, experiment_folder) {
 machine_name <- get_machine_name(working_directory, experiment_folder)
 write_analysis_params(machine_name)
 
-#################################experimenter#############################
-experimenter = ""
+################################# experimenter#############################
+experimenter <- ""
 
-experiment_type = paste0("Aversive_Memory_", test, "_paired")
-CS_plus = "OCT"
-concentration = "1:500"                
-US_Volt_pulses = "US = ES_75V 12 pulses 1/4sec_1X"
-Food = "SA-ATR-"
-Incubator_Light = "Blue"
-Genotype = "X"
+experiment_type <- paste0("Aversive_Memory_", test, "_paired")
+CS_plus <- "OCT"
+concentration <- "1:500"
+US_Volt_pulses <- "US = ES_75V 12 pulses 1/4sec_1X"
+Food <- "SA-ATR-"
+Incubator_Light <- "Blue"
+Genotype <- "X"
 
 
 nrow <- 1
@@ -136,8 +136,8 @@ border_mm <- 5
 # Behavioral masking
 # Ignore exits happening this amount of seconds
 # after the previous exit
-# to avoid counting the same exit 
-# as two exits happening within ridiculously little time  
+# to avoid counting the same exit
+# as two exits happening within ridiculously little time
 mask_duration <- 1
 
 treatments <- c(
@@ -159,7 +159,6 @@ treatments <- c(
 # Moreover, you get SUMMARY and PI .csv files
 
 if (test %in% c("PRE", "POST")) {
-  
   borders <- 5:10
   masks <- lapply(borders, function(i) {
     list(
@@ -178,8 +177,8 @@ if (test %in% c("PRE", "POST")) {
     )
     analysis_mask <- masks[[i]]
 
-    experiment_folder_01_Paired_1 = experiment_folder
-    newfolder <- paste0("#", experimenter, "_" ,experiment_folder_01_Paired_1, "_PLOTS & PI-DZ_",border_mm,"mm")
+    experiment_folder_01_Paired_1 <- experiment_folder
+    newfolder <- paste0("#", experimenter, "_", experiment_folder_01_Paired_1, "_PLOTS & PI-DZ_", border_mm, "mm")
     dir.create(file.path(experiment_folder_01_Paired_1, newfolder), )
 
     p <- idocr(
@@ -189,8 +188,8 @@ if (test %in% c("PRE", "POST")) {
       min_exits_required = min_exits_required,
       src_file = src_file,
       subtitle = paste0(
-        experimenter,"_",experiment_type, ", ", CS_plus, ", ",
-        concentration, " & ", US_Volt_pulses, ", ", Genotype , ", ",
+        experimenter, "_", experiment_type, ", ", CS_plus, ", ",
+        concentration, " & ", US_Volt_pulses, ", ", Genotype, ", ",
         Food, ", ", Incubator_Light
       ),
       delay = delay,
@@ -198,15 +197,12 @@ if (test %in% c("PRE", "POST")) {
       mask_duration = mask_duration,
       analysis_mask = analysis_mask,
       labels = labels,
-      nrow=nrow, ncol=ncol,
-      height=plot_height, width=plot_width,
+      nrow = nrow, ncol = ncol,
+      height = plot_height, width = plot_width,
     )
-    i <- i+1
-
+    i <- i + 1
   }
-
 } else if (test == "TRAIN") {
- 
   border_mm <- 7
   use_default_roi_centers(working_directory, experiment_folder)
   analysis_mask <- list(Fast_look_PLOT = c(0, Inf))
@@ -217,8 +213,8 @@ if (test %in% c("PRE", "POST")) {
     min_exits_required = min_exits_required,
     src_file = src_file,
     subtitle = paste0(
-      experimenter,"_",experiment_type, ", ", CS_plus, ", ",
-      concentration, " & ", US_Volt_pulses, ", ", Genotype , ", ",
+      experimenter, "_", experiment_type, ", ", CS_plus, ", ",
+      concentration, " & ", US_Volt_pulses, ", ", Genotype, ", ",
       Food, ", ", Incubator_Light
     ),
     delay = delay,
@@ -226,7 +222,7 @@ if (test %in% c("PRE", "POST")) {
     mask_duration = mask_duration,
     analysis_mask = analysis_mask,
     labels = labels,
-    nrow=nrow, ncol=ncol,
-    height=plot_height, width=plot_width
+    nrow = nrow, ncol = ncol,
+    height = plot_height, width = plot_width
   )
 }

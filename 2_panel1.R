@@ -17,9 +17,9 @@ experiments <- c("20min STM", "20min STM unpaired", "20min STM dunce", "20min ST
 valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
 panel1_data <- data[
   PRE_Reason %in% valid_reasons &
-  POST_Reason %in% valid_reasons &
-  Genotype %in% wts &
-  experiment %in% experiments,
+    POST_Reason %in% valid_reasons &
+    Genotype %in% wts &
+    experiment %in% experiments,
 ]
 
 data[, experiment := factor(experiment, levels = experiments)]
@@ -45,24 +45,24 @@ panel1A <- learning_plot(
 panel1B <- summary_plot(
   panel1_data_long,
   group = "experiment",
-  test=unpaired_t_test,
-  colors=colors_panel1,
-  comparisons=list(c("20min STM unpaired", "20min STM")),
-  annotation_y=1.0,
-  y_limits=c(-1, 1),
-  y_breaks=seq(-1, 1, 0.5),
-  preprocess_function=preprocess_summary_data_postPI,
-  geom="violin+sina",
-  text_vjust=1.5
+  test = unpaired_t_test,
+  colors = colors_panel1,
+  comparisons = list(c("20min STM unpaired", "20min STM")),
+  annotation_y = 1.0,
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  preprocess_function = preprocess_summary_data_postPI,
+  geom = "violin+sina",
+  text_vjust = 1.5
 )
 
-panelA <- panel1A$gg + guides(color="none") +
-  scale_fill_manual(values=colors_panel1, labels=c("Paired", "Unpaired"))
-panelB <-  panel1B$gg +
-  guides(fill="none", color="none")
-gg <- guide_area() + panelA + plot_spacer() + panelB + plot_spacer() + 
+panelA <- panel1A$gg + guides(color = "none") +
+  scale_fill_manual(values = colors_panel1, labels = c("Paired", "Unpaired"))
+panelB <- panel1B$gg +
+  guides(fill = "none", color = "none")
+gg <- guide_area() + panelA + plot_spacer() + panelB + plot_spacer() +
   plot_annotation(tag_levels = list(c("E", "F"))) +
-  plot_layout(guides = "collect", heights=c(.2,  1, .2, .7, .2), nrow=6) & 
-  theme(legend.position = "top") 
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.pdf"), width=100, height=230, unit="mm")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.svg"), width=100, height=230, unit="mm")
+  plot_layout(guides = "collect", heights = c(.2, 1, .2, .7, .2), nrow = 6) &
+  theme(legend.position = "top")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.pdf"), width = 100, height = 230, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.svg"), width = 100, height = 230, unit = "mm")

@@ -1,4 +1,3 @@
-
 preprocess_sleep_data <- function(data, group) {
   if (!is.null(group)) {
     if (!(group %in% colnames(data))) {
