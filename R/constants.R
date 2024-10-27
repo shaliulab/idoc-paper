@@ -62,8 +62,8 @@ LINEWIDTH_MEAN <- 1.2
 VJUST <- 0
 SUMMARY_PLOT_POINT_SIZE <- 2
 
-OUTPUT_FOLDER <- "2024-10-26"
-dir.create(OUTPUT_FOLDER)
+OUTPUT_FOLDER <- "output/2024-10-26"
+dir.create(OUTPUT_FOLDER, recursive = TRUE)
 dir.create(file.path(OUTPUT_FOLDER, "Fig1"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig2"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig3"))

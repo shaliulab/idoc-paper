@@ -12,3 +12,15 @@ figures/
 idoc_metadata_backup.ods
 /IDOC_metadata_AOJ - ethoscope_LTM.csv
 /IDOC_metadata_AOJ - metadata.csv
+CCC_Cs.csv
+IDOC_paper_metadata.csv
+tidy_data.csv
+reanalyze.csv
+.Rproj.user
+prism/
+*ipynb
+Rplots.pdf
+IDOC\ Experiment.xlsx
+LTM_poster.csv
+.RData
+.Rhistory
