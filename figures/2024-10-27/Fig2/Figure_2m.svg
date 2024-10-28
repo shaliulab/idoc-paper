@@ -27,9 +27,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.6017537"
-     inkscape:cx="309.03628"
-     inkscape:cy="201.96613"
+     inkscape:zoom="4.5304436"
+     inkscape:cx="284.29887"
+     inkscape:cy="216.86618"
      inkscape:window-width="2560"
      inkscape:window-height="1369"
      inkscape:window-x="-8"
@@ -227,7 +227,7 @@
        inkscape:export-ydpi="300"><tspan
          x="187.91992"
          y="42.34297"
-         id="tspan14">ZT</tspan></text><text
+         id="tspan3">ZT</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.34584453,0,0,0.34584453,-14.923866,19.419741)"
        id="text151615"
@@ -237,7 +237,7 @@
        inkscape:export-ydpi="300"><tspan
          x="187.91992"
          y="42.34297"
-         id="tspan15">2</tspan></text><text
+         id="tspan4">2</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.34584453,0,0,0.34584453,-3.9009756,19.419741)"
        id="text151619"
@@ -247,7 +247,7 @@
        inkscape:export-ydpi="300"><tspan
          x="187.91992"
          y="42.34297"
-         id="tspan17">3</tspan></text><text
+         id="tspan5">3</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.34584453,0,0,0.34584453,6.9434734,19.419741)"
        id="text151623"
@@ -257,7 +257,7 @@
        inkscape:export-ydpi="300"><tspan
          x="187.91992"
          y="42.34297"
-         id="tspan18">4</tspan></text><text
+         id="tspan6">4</tspan></text><text
        xml:space="preserve"
        transform="matrix(0.34584453,0,0,0.34584453,18.025062,19.419741)"
        id="text151627"
@@ -267,11 +267,11 @@
        inkscape:export-ydpi="300"><tspan
          x="187.91992"
          y="42.34297"
-         id="tspan19">5</tspan></text><text
+         id="tspan7">5</tspan></text><text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.482901"
        x="21.888571"
-       y="45.841003"
+       y="46.234127"
        id="text19699"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -280,9 +280,9 @@
          id="tspan19697"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.482901"
          x="21.888571"
-         y="45.841003">20 min STM</tspan></text><path
+         y="46.234127">20 min STM</tspan></text><path
        style="fill:none;stroke:#000000;stroke-width:0.423333;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 50.902171,45.794534 h 7.724737"
+       d="M 50.925003,46.08654 H 58.64974"
        id="path30638-4-1-7-9"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -301,7 +301,7 @@
        sodipodi:arg2="-0.29250811"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,8.5031094,-31.668769)"
+       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,8.5031094,-31.522766)"
        inkscape:transform-center-x="-5.6468777e-05"
        inkscape:transform-center-y="0.044965281"
        d="m 327.90998,79.499099 0.20786,0.690234 0.20786,0.690233 -0.70169,-0.165103 -0.70169,-0.165104 0.49383,-0.52513 z"
@@ -321,7 +321,7 @@
        sodipodi:arg2="-0.29250811"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,16.161475,-31.649928)"
+       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,16.161475,-31.503925)"
        inkscape:transform-center-x="-5.6795408e-05"
        inkscape:transform-center-y="0.044971936"
        d="m 327.90998,79.499099 0.20786,0.690234 0.20786,0.690233 -0.70169,-0.165103 -0.70169,-0.165104 0.49383,-0.52513 z"
@@ -338,7 +338,7 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.482901"
        x="26.564255"
-       y="55.846001"
+       y="56.049671"
        id="text78212"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -347,9 +347,9 @@
          id="tspan78210"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.482901"
          x="26.564255"
-         y="55.846001">1 hr  STM</tspan></text><path
+         y="56.049671">1 hr  STM</tspan></text><path
        style="fill:none;stroke:#000000;stroke-width:0.423333;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 50.349798,55.601809 H 65.262201"
+       d="M 50.925003,55.893815 H 65.837406"
        id="path78222"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -368,7 +368,7 @@
        sodipodi:arg2="-0.29250811"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,7.9507274,-22.123007)"
+       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,8.5031094,-21.655797)"
        inkscape:transform-center-x="-5.6729151e-05"
        inkscape:transform-center-y="0.044965028"
        d="m 327.90998,79.499099 0.20786,0.690234 0.20786,0.690233 -0.70169,-0.165103 -0.70169,-0.165104 0.49383,-0.52513 z"
@@ -388,7 +388,7 @@
        sodipodi:arg2="-0.29250811"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,22.789128,-21.938877)"
+       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,23.318295,-21.471667)"
        inkscape:transform-center-x="-5.6778627e-05"
        inkscape:transform-center-y="0.04497387"
        d="m 327.90998,79.499099 0.20786,0.690234 0.20786,0.690233 -0.70169,-0.165103 -0.70169,-0.165104 0.49383,-0.52513 z"
@@ -405,7 +405,7 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.482901"
        x="26.564255"
-       y="65.638535"
+       y="65.842216"
        id="text108251"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -414,9 +414,9 @@
          id="tspan108249"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;stroke-width:0.482901"
          x="26.564255"
-         y="65.638535">3 hr  STM</tspan></text><path
+         y="65.842216">3 hr  STM</tspan></text><path
        style="fill:none;stroke:#000000;stroke-width:0.423333;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 50.349798,65.402413 35.217983,2.08e-4"
+       d="m 50.925004,65.694419 35.217983,2.08e-4"
        id="path108261"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -435,7 +435,7 @@
        sodipodi:arg2="-0.29250811"
        inkscape:rounded="0"
        inkscape:randomized="0"
-       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,7.9507274,-12.322424)"
+       transform="matrix(0.17542992,0.18677929,-0.18677929,0.17542992,8.5031094,-11.79326)"
        inkscape:transform-center-x="-5.6729151e-05"
        inkscape:transform-center-y="0.044970637"
        d="m 327.90998,79.499099 0.20786,0.690234 0.20786,0.690233 -0.70169,-0.165103 -0.70169,-0.165104 0.49383,-0.52513 z"
@@ -516,7 +516,7 @@
          inkscape:export-ydpi="300"><tspan
            x="187.91992"
            y="42.34297"
-           id="tspan21">ZT</tspan></text><text
+           id="tspan8">ZT</tspan></text><text
          xml:space="preserve"
          transform="matrix(0.34584453,0,0,0.34584453,-11.984623,41.154122)"
          id="text4"
@@ -526,7 +526,7 @@
          inkscape:export-ydpi="300"><tspan
            x="187.91992"
            y="42.34297"
-           id="tspan22">2</tspan></text><text
+           id="tspan9">2</tspan></text><text
          xml:space="preserve"
          transform="matrix(0.34584453,0,0,0.34584453,21.968825,41.154122)"
          id="text5"
@@ -536,7 +536,7 @@
          inkscape:export-ydpi="300"><tspan
            x="187.91992"
            y="42.34297"
-           id="tspan23">3</tspan></text><text
+           id="tspan10">3</tspan></text><text
          xml:space="preserve"
          transform="matrix(0.34584453,0,0,0.34584453,55.743831,41.154122)"
          id="text6"
@@ -546,7 +546,7 @@
          inkscape:export-ydpi="300"><tspan
            x="187.91992"
            y="42.34297"
-           id="tspan24">4</tspan></text><text
+           id="tspan11">4</tspan></text><text
          xml:space="preserve"
          transform="matrix(0.34584453,0,0,0.34584453,89.755977,41.154122)"
          id="text7"
@@ -556,7 +556,7 @@
          inkscape:export-ydpi="300"><tspan
            x="187.91992"
            y="42.34297"
-           id="tspan25">5</tspan></text><text
+           id="tspan12">5</tspan></text><text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.43869px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.482901"
          x="12.34399"

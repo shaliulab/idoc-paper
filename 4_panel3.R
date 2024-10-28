@@ -91,6 +91,7 @@ gg <- ggplot() +
   plot_layout(design = design, heights = c(.4, 1, .4, 1)) &
   theme(
     legend.position = "bottom",
+    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +13),
     legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
   )
 gg

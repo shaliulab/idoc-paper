@@ -85,7 +85,10 @@ gg <- ggplot() +
   plot_spacer() +
   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
   plot_layout(design = design) &
-  theme(plot.margin = unit(c(0,0,20,0), "pt"))
+  theme(
+    plot.margin = unit(c(0,0,20,0), "pt"),
+    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +0)
+  )
 gg
 
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig2/Figure_2.pdf"), width = 190, height = 100, unit = "mm")
