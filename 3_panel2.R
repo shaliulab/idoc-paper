@@ -8,8 +8,7 @@ source("R/learning_plot.R", local = T)
 source("R/summary_plot.R", local = T)
 
 data <- data.table::fread(file = "tidy_data_wide.csv")
-sheets <- c("20min STM", "1hr STM", "3hr STM")
-experiments <- c("20min STM", "1hr STM", "3hr STM")
+experiments <- c("20min STM", "1hr STM", "3hr STM", "24hr STM")
 wts <- c("Iso31", "MB010B.(II)SPARC-Chrimson ISO", "MB010B.(II)SPARC-GFP ISO")
 valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
 panel2_data <- data[
@@ -30,14 +29,17 @@ panel2_data_long <- melt_idoc_data(panel2_data)
 panel2A <- learning_plot(
   panel2_data_long, "experiment", "horizontal",
   y_limits = c(-1, 1),
-  colors = colors_panel2[1:length(experiments)], test = paired_t_test,
+  colors = colors_panel2[1:length(experiments)],
   map_signif_level = TRUE,
   y_annotation = 0.75,
   textsize = 4,
   angle_n = 45,
   text_vjust = 1.5,
-  text_hjust = 1
+  text_hjust = 1,
+  point_size_mean = POINT_SIZE_MEAN*0.7
 )
+panel2A$gg <- panel2A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
+
 
 ref_pi <- panel2A$annotation[test == "POST" & group__ == "20min STM", PI]
 df <- panel2A$annotation[test == "POST", .(group__, norm_PI = PI / ref_pi, std_error)]
@@ -56,10 +58,11 @@ panel2B <- summary_plot(
   group = "experiment",
   comparisons = list(
     c("3hr STM", "20min STM"),
-    c("3hr STM", "1hr STM")
+    c("3hr STM", "1hr STM"),
+    c("24hr STM", "3hr STM")
   ),
   map_signif_level = T,
-  annotation_y = c(0.85, 0.65),
+  annotation_y = c(0.75, 0.65, .85),
   colors = colors_panel2[1:length(experiments)],
   y_limits = c(-1, 1),
   percentile = c(0.025, 0.975),
@@ -69,7 +72,7 @@ panel2B <- summary_plot(
   angle_n = 45,
   text_hjust = 1
 )
-
+panel2B$gg
 
 panelA <- panel2A$gg + guides(color = "none", fill = "none")
 panelB <- panel2B$gg + guides(color = "none", fill = "none")
@@ -87,9 +90,11 @@ gg <- ggplot() +
   plot_layout(design = design) &
   theme(
     plot.margin = unit(c(0,0,20,0), "pt"),
-    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +0)
+    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +0),
+    axis.title.y = element_text(margin = unit(c(0, 0, 0, 0), "mm")),
   )
 gg
 
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig2/Figure_2.pdf"), width = 190, height = 100, unit = "mm")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig2/Figure_2.svg"), width = 190, height = 100, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig2/Figure_2.pdf"), width = 210, height = 100, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig2/Figure_2.svg"), width = 210, height = 100, unit = "mm")
+

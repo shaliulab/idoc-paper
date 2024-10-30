@@ -72,6 +72,7 @@ index <- data.table::fread("index.csv")
 
 for (i in 1:nrow(index)) {
   idoc_folder <-index[i, idoc_folder]
+  print(idoc_folder)
   pre_session <- rev(unlist(strsplit(index[i, PRE_files[[1]]], split = "/")))[3]
   post_session <- rev(unlist(strsplit(index[i, POST_files[[1]]], split = "/")))[3]
   copy_experiment_folder(idoc_folder, dest_folder, pre_session, post_session, dry_run = F)

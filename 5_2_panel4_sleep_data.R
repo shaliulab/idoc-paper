@@ -73,9 +73,15 @@ process_sleep_dataset <- function(panel4_data, periods) {
   )
   test_out[is.na(winner), winner := FALSE]
   test_out$symbol <- ""
+  test_out$symbol_ml <- ""
+  
   test_out[p < 0.05, symbol := "*"]
   test_out[p < 0.01, symbol := "**"]
   test_out[p < 0.005, symbol := "***"]
+  test_out[p < 0.05, symbol_ml := "*"]
+  test_out[p < 0.01, symbol_ml := "*\n*"]
+  test_out[p < 0.005, symbol_ml := "*\n*\n*"]
+  
   test_out[, zt := t / behavr::hours(1)]
 
 

@@ -66,10 +66,10 @@ panel1A <- learning_plot(
   colors = colors_panel1[1:length(groups_in_figure_1)],
   y_limits = c(-1, 1),
   y_breaks = seq(-1, 1, 0.5),
-  distribution_color = "#CBCBCB",
   text_vjust = 1.5,
   angle_n = 0
 )
+panel1A$gg
 
 panel1B <- summary_plot(
   panel1_data_long,
@@ -97,18 +97,18 @@ template <- ggplot() + learning_plot_theme
 
 
 design <- "
+ AABB
+ AABB
+ AABB
  AACC
  AACC
- AACC
- AADD
- AADD
- BBEE
- BBEE
- BBEE
- BBFF
- BBFF
- BBFF
- BBFF
+ DDEE
+ DDEE
+ DDEE
+ DDFF
+ DDFF
+ DDFF
+ DDFF
 "
 
 

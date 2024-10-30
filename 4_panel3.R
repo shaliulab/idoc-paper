@@ -46,7 +46,8 @@ panel3A <- learning_plot(
   vjust = 0,
   text_hjust = 1,
   text_vjust = 1,
-  textsize = 5
+  textsize = 5,
+  point_size_mean = POINT_SIZE_MEAN*0.7
 )
 panel3B <- summary_plot(
   panel3_data_long,
@@ -77,10 +78,10 @@ panelB <- panel3B$gg +
   )
 
 design <- "
-######
-AAABBB
-######
-CCC###
+#######
+AAAABBB
+#######
+####CCC
 "
 
 gg <- ggplot() +

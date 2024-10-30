@@ -10,7 +10,6 @@ figures/
 /metadata.csv
 /metadata_etho.csv
 idoc_metadata_backup.ods
-/IDOC_metadata_AOJ - ethoscope_LTM.csv
 /IDOC_metadata_AOJ - metadata.csv
 CCC_Cs.csv
 IDOC_paper_metadata.csv
@@ -24,3 +23,5 @@ IDOC\ Experiment.xlsx
 LTM_poster.csv
 .RData
 .Rhistory
+/IDOC_dataset
+/IDOC_metadata_AOJ - ethoscope_overnight.csv

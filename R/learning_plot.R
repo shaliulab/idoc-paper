@@ -18,6 +18,8 @@ learning_plot <- function(
     test = paired_t_test,
     map_signif_level = TRUE,
     y_limits = c(-1, 1),
+    trend_statistic = TREND_STATISTIC,
+    error_statistic = ERROR_STATISTIC,
     colors = NULL,
     y_annotation = NULL,
     x_annotation = 1.5,
@@ -31,7 +33,7 @@ learning_plot <- function(
     expansion_y_bottom = EXPANSION_Y_BOTTOM,
     expansion_y_top = EXPANSION_Y_TOP,
     y_breaks = waiver(),
-    distribution_color = "#808080",
+    distribution_color = DISTRIBUTION_COLOR,
     linewidth = LINEWIDTH,
     point_size = POINT_SIZE,
     linewidth_mean = LINEWIDTH_MEAN,
@@ -52,7 +54,13 @@ learning_plot <- function(
 
   group <- "group__"
 
-  annotation_df <- make_annotation_df(df = data, variable = group, test = test, alt = "greater")
+  annotation_df <- make_annotation_df(
+    df = data, variable = group,
+    test = test,
+    trend_statistic = trend_statistic,
+    error_statistic = error_statistic,
+    alt = "greater"
+  )
   data$x <- ifelse(data$test == "PRE", 1, 2)
   annotation_df$x <- ifelse(annotation_df$test == "PRE", 1, 2)
   n_facets <- length(unique(data$group__))
@@ -68,7 +76,8 @@ learning_plot <- function(
       linewidth = linewidth
     )
   panel <- add_trend_geom(
-    panel, annotation_df, colors,
+    panel, annotation_df,
+    colors = colors,
     point_size = point_size_mean,
     linewidth = linewidth_mean,
     ERRORBAR_WIDTH
@@ -84,7 +93,10 @@ learning_plot <- function(
     angle = angle_n
   )
   panel <- add_facet(panel, direction)
-  panel <- panel + scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0)))
+  panel <- panel +
+    scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0))) +
+    scale_x_discrete(expand = expansion(add=c(.1,.1)))
+  
 
   if (!is.null(test)) {
     panel <- tryCatch({
@@ -96,7 +108,6 @@ learning_plot <- function(
         return(panel)
     })
   }
-
   panel <- panel + coord_cartesian(clip = "off", ylim = y_limits) + learning_plot_theme
 
   data$group__ <- NULL
@@ -123,12 +134,36 @@ save_learning_plot <- function(plot, ratio, size_unit = 5, ...) {
 }
 
 add_trend_geom <- function(
-    panel, annotation_df, colors,
+    panel, annotation_df,
+    colors = NULL,
     point_size = POINT_SIZE_MEAN,
     linewidth = LINEWIDTH_MEAN,
     errorbar_width = ERRORBAR_WIDTH) {
-  std_error <- group__ <- x <- PI <- NULL
 
+  error <- group__ <- x <- PI <- NULL
+  
+  
+  margin <- 0.0 # 0.04
+  annotation_df[, margin := margin]
+  annotation_df[, ymin := ifelse((PI - error) < (PI - margin), (PI - error), (PI - margin))]
+  annotation_df[, ymax := ifelse((PI + error) > (PI + margin), (PI + error), (PI + margin))]
+  
+  print(annotation_df)
+  # panel <- panel +
+  #   geom_errorbar(
+  #     data = annotation_df,
+  #     aes(
+  #       x = x, y = PI,
+  #       ymin = ymin,
+  #       ymax = ymax,
+  #       # width = errorbar_width * N,
+  #       # color = group__,
+  #       group = group__
+  #     ),
+  #     width = errorbar_width,
+  #     linewidth = 1
+  #   )
+  
   if (is.null(colors)) {
     panel <- panel +
       geom_line(
@@ -164,33 +199,17 @@ add_trend_geom <- function(
       geom_point(
         data = annotation_df,
         size = point_size,
+        # shape = 1,
         mapping = aes(
           color = group__,
           x = x, y = PI,
           group = group__
         )
       ) +
-      # ggforce::geom_circle(
-      #   data = annotation_df, color = NA,
-      #   aes(
-      #     fill = group__, r = point_size_mean,
-      #     x0 = x, y0 = PI, group = group__
-      #   )
-      # ) +
       scale_fill_manual(values = colors) +
       scale_color_manual(values = colors)
   }
-
-  panel <- panel +
-    geom_errorbar(
-      data = annotation_df,
-      aes(
-        x = x, y = PI, ymin = PI - std_error, ymax = PI + std_error,
-        color = group__, group = group__
-      ),
-      linewidth = 1,
-      width = errorbar_width
-    )
+  
 
   return(panel)
 }

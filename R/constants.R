@@ -33,13 +33,16 @@ NS_6X_spaced_cxm <- "#f53542"
 orb2_6x_spaced <- "#2667ff"
 orb2_20min <- "#add7f6"
 zt05_11_sd <- "#61a119"
+DISTRIBUTION_COLOR <- "#CBCBCB"
+ERROR_STATISTIC <- "std_error"
+TREND_STATISTIC <- "average"
+
 
 colors_panel1 <- c(paired, unpaired, dunce, orco)
 colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr)
 colors_panel3 <- c(NS_6x_spaced, NS_6X_spaced_cxm, orb2_6x_spaced, orb2_20min)
 colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, no_training)
 colors_panel5 <- c(NS_6x_spaced, zt05_11_sd)
-
 
 
 expansion_x_left <- 0.1
@@ -52,6 +55,7 @@ width <- dev.size("cm")[1] * 10
 
 POINT_SIZE <- width * 0.008
 ERRORBAR_WIDTH <- .1
+print(ERRORBAR_WIDTH)
 POINT_SIZE_MEAN <- width * 0.012
 print(POINT_SIZE)
 print(POINT_SIZE_MEAN)

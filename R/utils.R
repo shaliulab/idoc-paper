@@ -1,9 +1,10 @@
 library(data.table)
 library(ggplot2)
 
-make_annotation_df <- function(df, variable, test, ...) {
+make_annotation_df <- function(df, variable, test, trend_statistic, error_statistic, ...) {
   var__ <- std_error <- PI_std <- N <- PI <- . <- NULL
 
+  
   values <- levels(df[[variable]])
   if (is.null(values)) {
     values <- unique(df[[variable]])
@@ -62,17 +63,23 @@ make_annotation_df <- function(df, variable, test, ...) {
 
   df$var__ <- df[[variable]]
   stats_df <- df[, .(
-    PI = mean(PI),
-    PI_median = median(PI),
-    PI_std = sd(PI)
+    average = mean(PI),
+    median = median(PI),
+    std = sd(PI)
   ), by = .(var__, test)]
   stats_df[[variable]] <- stats_df$var__
   stats_df$var__ <- NULL
   annotation_df <- merge(annotation_df, stats_df, by = variable)
 
-  annotation_df[, std_error := PI_std / sqrt(N)]
+  annotation_df[, std_error := std / sqrt(N)]
   annotation_df$group__ <- annotation_df[[variable]]
-  annotation_df
+
+  stopifnot(error_statistic %in% colnames(annotation_df))
+  stopifnot(trend_statistic %in% colnames(annotation_df))
+  annotation_df$error <- annotation_df[[error_statistic]]
+  annotation_df$PI <- annotation_df[[trend_statistic]]
+  
+  return(annotation_df)
 }
 
 add_n_annotation <- function(panel, annotation_df, x_annotation = NULL, y_annotation = -Inf, text_vjust = 0, text_hjust = 0, textsize = TEXT_SIZE, family = FONT, angle = 0) {

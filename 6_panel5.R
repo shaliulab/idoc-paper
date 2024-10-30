@@ -32,6 +32,8 @@ columns <- c(
   "Genotype", "experiment", "PRE", "POST", "SD_status", "interval"
 )
 
+panel5_data[interval=="ZT05-ZT11", .(n = .N), by=Files]
+
 
 export_csvs(panel5_data, "interval", intervals, 5, columns)
 
@@ -47,6 +49,8 @@ panel5A <- learning_plot(
   text_vjust = 2.5,
   textsize = 3
 )
+panel5A$gg <- panel5A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
+
 panel5B <- summary_plot(
   data = panel5_data_long, "interval",
   comparisons = list(
