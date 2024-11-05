@@ -198,15 +198,19 @@ gg <- ggplot() +
   guides(color = "none", fill = "none") +
   panel4D_all[[2]]$gg +
   guides(color = "none", fill = "none") +
-  (panel4C$gg +
-  guides(color = "none", fill = "none") +
-  theme(
-    plot.margin = unit(c(30, 0, 0, 0), "pt")
-  )) +
+  (
+    panel4C$gg +
+    guides(color = "none", fill = "none") +
+    theme(
+      plot.margin = unit(c(60, 0, 0, 0), "pt")
+    )
+  ) +
   plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "F"))) +
-  plot_layout(design = layout, heights = c(3, 1.6, 1.2)) &
-  theme(legend.position = "bottom")
+  plot_layout(design = layout, heights = c(3, 2.5, 2.2)) &
+  theme(
+    legend.position = "bottom"
+  )
 
 gg
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.pdf"), width = 210, height = 230, unit = "mm")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.svg"), width = 210, height = 230, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.pdf"), width = 210, height = 280, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.svg"), width = 210, height = 280, unit = "mm")

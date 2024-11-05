@@ -108,18 +108,15 @@ design <- "
  DDFF
  DDFF
  DDFF
- DDFF
 "
 
 
 gg <- template + template +
   template + template +
-  (panelA + theme(plot.margin = unit(c(0, 0, 30, 0), "pt"))) + 
-  (panelB + theme(plot.margin = unit(c(10, 0, 0, 0), "pt"))) + 
+  (panelA + theme(plot.margin = unit(c(0, 0, 40, 0), "pt"))) + 
+  (panelB + theme(plot.margin = unit(c(30, 0, 0, 0), "pt"))) + 
   plot_annotation(tag_levels = list(c(LETTERS[1:6]))) +
-  plot_layout(design=design) & theme(
-    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +3)
-  )
+  plot_layout(design=design)
 gg
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.pdf"), width = 210, height = 297, unit = "mm")
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.svg"), width = 210, height = 297, unit = "mm")

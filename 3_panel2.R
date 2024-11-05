@@ -40,15 +40,22 @@ panel2A <- learning_plot(
 )
 panel2A$gg <- panel2A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
 
+panel2A$annotation[, t := NA_real_]
+panel2A$annotation[group__ == "20min STM", t := behavr::mins(20)]
+panel2A$annotation[group__ == "1hr STM", t := behavr::hours(1)]
+panel2A$annotation[group__ == "3hr STM", t := behavr::hours(3)]
+panel2A$annotation[group__ == "24hr STM", t := behavr::hours(24)]
+#panel2A$annotation[, x := group__]
 
 ref_pi <- panel2A$annotation[test == "POST" & group__ == "20min STM", PI]
-df <- panel2A$annotation[test == "POST", .(group__, norm_PI = PI / ref_pi, std_error)]
-ggplot(data = df, aes(x = group__, y = norm_PI, group = 1)) +
+df <- panel2A$annotation[test == "POST", .(x = group__, norm_PI = PI / ref_pi, std_error)]
+ggplot(data = df, aes(x = x, y = norm_PI, group = 1)) +
   geom_line() +
   geom_point() +
-  geom_errorbar(aes(x = group__, ymin = norm_PI - std_error / ref_pi, ymax = norm_PI + std_error / ref_pi), width = .1) +
-  scale_x_discrete(labels = c(0.3, 1, 3), name = "Time after training (h)") +
-  scale_y_continuous(limits = c(0, 2), breaks = c(0, 1), labels = c(0, 100), name = "STM %") +
+  geom_errorbar(aes(x = x, ymin = norm_PI - std_error / ref_pi, ymax = norm_PI + std_error / ref_pi), width = .1) +
+  # scale_x_discrete(labels = c(0.3, 1, 3, 24), name = "Time after training (h)") +
+  scale_x_discrete(labels = c(0.3, 1, 3, 24), "Time after training (h)") +
+  scale_y_continuous(name = "STM %", breaks=c(0, .5, 1), labels=c(0, 50, 100)) +
   geom_hline(yintercept = 1, linetype = "dashed")
 
 
@@ -62,7 +69,7 @@ panel2B <- summary_plot(
     c("24hr STM", "3hr STM")
   ),
   map_signif_level = T,
-  annotation_y = c(0.75, 0.65, .85),
+  annotation_y = c(0.8, 0.65, 0.95),
   colors = colors_panel2[1:length(experiments)],
   y_limits = c(-1, 1),
   percentile = c(0.025, 0.975),
@@ -72,7 +79,7 @@ panel2B <- summary_plot(
   angle_n = 45,
   text_hjust = 1
 )
-panel2B$gg
+
 
 panelA <- panel2A$gg + guides(color = "none", fill = "none")
 panelB <- panel2B$gg + guides(color = "none", fill = "none")
@@ -89,8 +96,7 @@ gg <- ggplot() +
   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
   plot_layout(design = design) &
   theme(
-    plot.margin = unit(c(0,0,20,0), "pt"),
-    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +0),
+    plot.margin = unit(c(20,20,20,0), "pt"),
     axis.title.y = element_text(margin = unit(c(0, 0, 0, 0), "mm")),
   )
 gg

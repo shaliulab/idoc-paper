@@ -73,9 +73,9 @@ gg <- plot_spacer() + plot_spacer() + plot_spacer() + ggplot() + learning_plot_t
   scale_fill_manual(values = colors_panel5, labels = c("No stimulator", "ZT05-ZT11")) +
   (panel5B$gg + guides(color = "none", fill = "none")) + plot_spacer() + plot_spacer() + plot_spacer() +
   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
-  plot_layout(nrow = 3, heights = c(.2, 1, .2), widths = c(1.2, .4, .4), guides = "collect") &
+  plot_layout(nrow = 3, heights = c(.2, 1, .2), widths = c(1.2, .4, .6), guides = "collect") &
   theme(legend.position = "none")
 
 gg
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.pdf"), width = 180, height = 100, unit = "mm")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.svg"), width = 180, height = 100, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.pdf"), width = 210, height = 100, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.svg"), width = 210, height = 100, unit = "mm")

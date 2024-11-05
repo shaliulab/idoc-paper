@@ -89,10 +89,9 @@ gg <- ggplot() +
   panelA +
   panelB  +
   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
-  plot_layout(design = design, heights = c(.4, 1, .4, 1)) &
+  plot_layout(design = design, heights = c(.4, 1, .6, 1)) &
   theme(
     legend.position = "bottom",
-    plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +13),
     legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
   )
 gg
