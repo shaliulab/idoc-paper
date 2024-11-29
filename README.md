@@ -22,3 +22,11 @@ bash generate_figures.sh
 ```
 bash combine_figures.sh
 ```
+
+### Analyze IDOC experiment:
+
+To analyze all experiments and compute a PI for each fly, run
+
+```
+bash scripts/main.sh
+```
