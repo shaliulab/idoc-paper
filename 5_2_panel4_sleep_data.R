@@ -1,4 +1,4 @@
-process_sleep_dataset <- function(panel4_data, periods) {
+process_sleep_dataset <- function(panel4_data, periods, trainings) {
   dt_bin <- readRDS("dt_bin.RDS")
   metadata_no_training <- dt_bin[, meta = T][PRE_ROI == "NONE", ]
   metadata <- dt_bin[, meta = T][PRE_ROI != "NONE", ]
@@ -11,6 +11,7 @@ process_sleep_dataset <- function(panel4_data, periods) {
   metadata$PRE_ROI <- as.character(metadata$PRE_ROI)
   metadata$POST_ROI <- as.character(metadata$POST_ROI)
   metadata <- rbind(metadata, metadata_no_training)
+  
   data.table::setkey(metadata, id)
   behavr::setmeta(dt_bin, metadata)
   dt_bin <- dt_bin[!is.na(xmv(Training)), ]
@@ -19,15 +20,12 @@ process_sleep_dataset <- function(panel4_data, periods) {
   group <- "Training"
 
   dt_bin_full <- behavr::rejoin(dt_bin)
-  table(dt_bin_full$Training)
 
-  dt_bin_full_wide <- add_ghost_data(dt_bin_full, id = id, x = "t", columns = c("asleep"), group = group, to_wide = TRUE)
-
-  dt_bin_full_wide$zt <- dt_bin_full_wide$t / 3600
-  out <- dt_bin_full_wide[, setdiff(colnames(dt_bin_full_wide), c("zt", "t")), with = FALSE]
-  print(dim(out))
-
-
+  # dt_bin_full_wide <- add_ghost_data(dt_bin_full, id = id, x = "t", columns = c("asleep"), group = group, to_wide = TRUE)
+  # 
+  # dt_bin_full_wide$zt <- dt_bin_full_wide$t / 3600
+  # out <- dt_bin_full_wide[, setdiff(colnames(dt_bin_full_wide), c("zt", "t")), with = FALSE]
+  
   # testing sleep amount differences over time
   dt_counts <- dt_bin_full[, .N, by = .(t, Training)][, .N, by = t]
   time_testing <- dt_counts[N == 3, t]

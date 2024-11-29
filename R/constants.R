@@ -20,7 +20,7 @@ zts <- list(
 )
 
 NS_6x_spaced <- "magenta"
-NS_6x_massed <- "#A5402D"
+NS_6x_massed <- "#D9F0FF"
 no_training <- "black"
 paired <- "blue"
 unpaired <- "red"
@@ -41,7 +41,7 @@ TREND_STATISTIC <- "average"
 colors_panel1 <- c(paired, unpaired, dunce, orco)
 colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr)
 colors_panel3 <- c(NS_6x_spaced, NS_6X_spaced_cxm, orb2_6x_spaced, orb2_20min)
-colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, no_training)
+colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, paired, no_training)
 colors_panel5 <- c(NS_6x_spaced, zt05_11_sd)
 
 
@@ -65,7 +65,7 @@ LINEWIDTH_MEAN <- 1.2
 VJUST <- 0
 SUMMARY_PLOT_POINT_SIZE <- 2
 
-OUTPUT_FOLDER <- "figures/2024-10-27"
+OUTPUT_FOLDER <- "figures/paper"
 dir.create(OUTPUT_FOLDER, recursive = TRUE)
 dir.create(file.path(OUTPUT_FOLDER, "Fig1"))
 dir.create(file.path(OUTPUT_FOLDER, "Fig2"))

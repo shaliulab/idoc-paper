@@ -34,10 +34,21 @@ panel1_data[, experiment := factor(experiment, levels = experiments)]
 unique(panel1_data$Group)
 
 groups_in_figure_1 <- c("20min STM", "20min STM unpaired", "dunce", "orco")
+comparisons <- list(
+  c("20min STM unpaired", "20min STM"),
+  c("orco", "20min STM"),
+  c("dunce", "20min STM")
+)
+
+groups_in_figure_1 <- c("20min STM", "20min STM unpaired")
+comparisons <- list(
+  c("20min STM unpaired", "20min STM")
+)
+
 panel1_data <- panel1_data[
   Group %in% groups_in_figure_1
 ]
-panel1_data[, Group := factor(Group, levels = groups)]
+panel1_data[, Group := factor(Group, levels = groups_in_figure_1)]
 
 
 
@@ -47,15 +58,16 @@ export_csvs(panel1_data, "Group", groups, 1, columns)
 panel1_data[Group == "dunce", c("POST_1", "POST_2", columns), with=F]
 
 panel1_data_long <- melt_idoc_data(panel1_data)[, .(Group, id, PI, test)]
-panel1_data_long <- rbind(
-  panel1_data_long,
-  data.table(
-    Group = c("orco", "orco"),
-    id = c(-1, -1),
-    PI = c(0, 0),
-    test = c("PRE", "POST")
-  )
-)
+
+# panel1_data_long <- rbind(
+#   panel1_data_long,
+#   data.table(
+#     Group = c("orco", "orco"),
+#     id = c(-1, -1),
+#     PI = c(0, 0),
+#     test = c("PRE", "POST")
+#   )
+# )
 
 
 panel1A <- learning_plot(
@@ -67,20 +79,15 @@ panel1A <- learning_plot(
   y_limits = c(-1, 1),
   y_breaks = seq(-1, 1, 0.5),
   text_vjust = 1.5,
-  angle_n = 0
+  angle_n = 0,
+  offset=0.25
 )
-panel1A$gg
-
 panel1B <- summary_plot(
   panel1_data_long,
   group = "Group",
   colors = colors_panel1,
-  comparisons = list(
-    c("20min STM unpaired", "20min STM"),
-    c("orco", "20min STM"),
-    c("dunce", "20min STM")
-  ),
-  annotation_y = c(0.75, 0.9, 1.05),
+  comparisons = comparisons,
+  annotation_y = c(0.75, 0.9, 1.05)[1:length(comparisons)],
   y_limits = c(-1, 1),
   y_breaks = seq(-1, 1, 0.5),
   geom = "violin+sina",

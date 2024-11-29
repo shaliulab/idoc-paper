@@ -77,5 +77,5 @@ gg <- plot_spacer() + plot_spacer() + plot_spacer() + ggplot() + learning_plot_t
   theme(legend.position = "none")
 
 gg
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.pdf"), width = 210, height = 100, unit = "mm")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.svg"), width = 210, height = 100, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.pdf"), width = 210, height = 100, unit = "mm", dpi="retina")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.svg"), width = 210, height = 100, unit = "mm", dpi="retina")

@@ -41,7 +41,9 @@ learning_plot <- function(
     family = FONT,
     vjust = VJUST,
     angle_n = 45,
-    text_vjust = 0) {
+    text_vjust = 0,
+    offset=0
+    ) {
   if (is.null(group)) {
     df$group__ <- "A"
   } else if (!(group %in% colnames(data))) {
@@ -61,8 +63,8 @@ learning_plot <- function(
     error_statistic = error_statistic,
     alt = "greater"
   )
-  data$x <- ifelse(data$test == "PRE", 1, 2)
-  annotation_df$x <- ifelse(annotation_df$test == "PRE", 1, 2)
+  data$x <- ifelse(data$test == "PRE", 1+offset, 2-offset)
+  annotation_df$x <- ifelse(annotation_df$test == "PRE", 1+offset, 2-offset)
   n_facets <- length(unique(data$group__))
 
   panel <- ggplot(data = data, aes(x = x, y = PI)) +
@@ -101,7 +103,10 @@ learning_plot <- function(
   if (!is.null(test)) {
     panel <- tryCatch({
       add_significance_marks(
-        panel, test, annotation_df, y_annotation, vjust, starsize, map_signif_level, family
+        panel, test, annotation_df, y_annotation, vjust,
+        textsize = starsize,
+        map_signif_level = map_signif_level,
+        family = family
       )},
       error = function(e) {
         print(e)

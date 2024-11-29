@@ -14,14 +14,14 @@ parse_interval <- function(intervals, idx) {
   return(x)
 }
 
-load_ethoscope_data_for_idoc_paper <- function() {
+load_ethoscope_data_for_idoc_paper <- function(trainings) {
   metadata <- data.table::fread("metadata.csv")
-  metadata <- metadata[experiment %in% c("24hr LTM", "24hr LTM GTACR"), ]
+  metadata <- metadata[experiment %in% c("24hr LTM", "24hr LTM GTACR", "24hr STM"), ]
   metadata <- metadata[!is.na(date), ]
   metadata <- metadata[Genotype == "Iso31", ]
   metadata <- metadata[interactor %in% c("NONE", "DefaultStimulator"), ]
   metadata[, .N, by = .(interactor, experiment, Training)]
-  metadata$Training <- factor(metadata$Training, levels = c("No_training", "6X_Massed", "6X_Spaced"))
+  metadata$Training <- factor(metadata$Training, levels = trainings)
   metadata[is.na(PRE_ROI), PRE_ROI := "NONE"]
   metadata[is.na(POST_ROI), POST_ROI := "NONE"]
 

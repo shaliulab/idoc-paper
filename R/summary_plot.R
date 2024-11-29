@@ -26,7 +26,7 @@ preprocess_summary_data_postPI <- function(data, group, test, value.var = "PI") 
 }
 
 preprocess_function_default <- preprocess_summary_data_postPI
-y_axis_label_default <- "Post PI"
+y_axis_label_default <- "Post Conditioning PI"
 
 # preprocess_function_default <- preprocess_summary_data_deltaPI
 # y_axis_label_default <- "ΔPI"
@@ -63,6 +63,8 @@ summary_plot <- function(
     data = data, group = group,
     test = "test", value.var = "PI"
   )
+  data[, outlier := FALSE]
+  
   stopifnot("PI" %in% colnames(data))
 
   if (!is.null(colors)) {
@@ -78,7 +80,6 @@ summary_plot <- function(
     ymax = quantile(PI, percentile[2]),
     N = .N
   ), by = group__]
-  data[, outlier := FALSE]
   for (grp in data_summ$group__) {
     data[group__ == grp & (PI < data_summ[group__ == grp, ymin] | PI > data_summ[group__ == grp, ymax]), outlier := TRUE]
   }

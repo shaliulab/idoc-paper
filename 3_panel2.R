@@ -20,9 +20,11 @@ panel2_data <- data[
 ]
 panel2_data[, experiment := factor(experiment, levels = experiments)]
 
-
+panel2_data[experiment=="24hr STM", .N, by=Files]
 columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "Genotype", "experiment", "PRE", "POST")
 export_csvs(panel2_data, "experiment", experiments, 2, columns)
+
+
 
 panel2_data_long <- melt_idoc_data(panel2_data)
 
@@ -36,7 +38,8 @@ panel2A <- learning_plot(
   angle_n = 45,
   text_vjust = 1.5,
   text_hjust = 1,
-  point_size_mean = POINT_SIZE_MEAN*0.7
+  point_size_mean = POINT_SIZE_MEAN*0.7,
+  offset=.15
 )
 panel2A$gg <- panel2A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
 

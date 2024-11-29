@@ -147,8 +147,8 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
   results <- lapply(trials, function(trial) {
     tryCatch(
       {
-        path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial = trial, verbose = verbose)
         val <- list(pi = NA, n_exits = NA, file = NA, aversive = NA, appetitive = NA)
+        path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial = trial, verbose = verbose)
         if (is.null(path)) {
           val
         } else {

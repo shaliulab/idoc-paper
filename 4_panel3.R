@@ -47,7 +47,8 @@ panel3A <- learning_plot(
   text_hjust = 1,
   text_vjust = 1,
   textsize = 5,
-  point_size_mean = POINT_SIZE_MEAN*0.7
+  point_size_mean = POINT_SIZE_MEAN*0.7,
+  offset=0.15
 )
 panel3B <- summary_plot(
   panel3_data_long,
@@ -78,10 +79,10 @@ panelB <- panel3B$gg +
   )
 
 design <- "
-#######
-AAAABBB
-#######
-####CCC
+#########
+AAAA##BBB
+#########
+CCCC#####
 "
 
 gg <- ggplot() +
@@ -95,6 +96,25 @@ gg <- ggplot() +
     legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
   )
 gg
+
+design <- "
+  BBBCCC
+"
+
+gg_horizontal <- panelA +
+  panelB  +
+  plot_annotation(tag_levels = list(c("B", "C"))) +
+  plot_layout(design=design) &
+  theme(
+    legend.position = "bottom",
+    plot.margin = unit(c(20,20,20,0), "pt"),
+    legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
+  )
+suppressWarnings({
+  ggsave(plot = gg_horizontal, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3_horizontal.svg"), width = 120, height = 120*6/9, units = "mm")
+  print(gg_horizontal)
+})
+
 suppressWarnings({
   ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.pdf"), width = 210, height = 240, units = "mm")
   ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.svg"), width = 210, height = 240, units = "mm")
