@@ -35,6 +35,8 @@ panel4_data <- data[
 ]
 panel4_data[, Training := factor(Training, levels = trainings)]
 
+data[Training=="6X_Massed", .(PRE_Reason, POST_Reason)]
+
 columns <- c(
   "Files", "idoc_folder", "PRE_ROI", "POST_ROI",
   "User", "Genotype", "experiment",

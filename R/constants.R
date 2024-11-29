@@ -20,7 +20,7 @@ zts <- list(
 )
 
 NS_6x_spaced <- "magenta"
-NS_6x_massed <- "#D9F0FF"
+NS_6x_massed <- "#145C9E"
 no_training <- "black"
 paired <- "blue"
 unpaired <- "red"

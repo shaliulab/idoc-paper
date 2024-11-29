@@ -38,7 +38,7 @@ find_pi_file <- function(folder, test, idoc_folder, region_id, trial = NULL, ver
     result_folder <- file.path(folder, paste0(test, "_", trial, "_7mm"))
     if (!file.exists(result_folder)) {
       result_folder <- file.path(
-        list.files(folder, pattern = "& PI-DZ_", mm_decision_zone, "mm", full.names = TRUE),
+        list.files(folder, pattern = paste0("& PI-DZ_", mm_decision_zone, "mm"), full.names = TRUE),
         paste0(test, "_", trial, "_7mm")
       )
     }
