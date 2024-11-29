@@ -28,21 +28,21 @@ load_sessions_v2 <- function(idoc_folder) {
   return(sessions)
 }
 
-find_pi_file <- function(folder, test, idoc_folder, region_id, trial = NULL, verbose = FALSE) {
+find_pi_file <- function(folder, test, idoc_folder, region_id, trial = NULL, verbose = FALSE, mm_decision_zone=7) {
   if (is.null(trial)) {
     pi_file <- list.files(folder, pattern = "_PI.csv", full.names = TRUE)
     if (length(pi_file) == 0) {
-      pi_file <- list.files(folder, pattern = "GLOBAL_7.*mm.*csv", full.names = TRUE, recursive = TRUE)[1]
+      pi_file <- list.files(folder, pattern = "GLOBAL_", mm_decision_zone, ".*mm.*csv", full.names = TRUE, recursive = TRUE)[1]
     }
   } else {
     result_folder <- file.path(folder, paste0(test, "_", trial, "_7mm"))
     if (!file.exists(result_folder)) {
       result_folder <- file.path(
-        list.files(folder, pattern = "& PI-DZ_7mm", full.names = TRUE),
+        list.files(folder, pattern = "& PI-DZ_", mm_decision_zone, "mm", full.names = TRUE),
         paste0(test, "_", trial, "_7mm")
       )
     }
-    pi_files <- list.files(result_folder, pattern = paste0(test, "_", trial, "_7mm.csv"), full.names = TRUE, recursive = TRUE)
+    pi_files <- list.files(result_folder, pattern = paste0(test, "_", trial, "_", mm_decision_zone, "mm.csv"), full.names = TRUE, recursive = TRUE)
     pi_files <- grep(pattern = "SUMMARY", x = pi_files, value = TRUE, invert = TRUE)
     pi_file <- pi_files
     # pi_file <- list.files(folder, pattern = paste0(test, "_", trial, "_7mm.csv"), full.names = TRUE, recursive=TRUE)
@@ -143,12 +143,12 @@ best_trial <- function(results, min_exits_per_trial, use_incomplete_tests) {
   return(list(pi = pi, n_exits = n_exits))
 }
 
-read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, trials, min_exits_per_trial = 3, verbose = FALSE, use_incomplete_tests = TRUE, summary_FUN = average_trial) {
+read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, trials, min_exits_per_trial = 3, verbose = FALSE, use_incomplete_tests = TRUE, summary_FUN = average_trial, mm_decision_zone = 7) {
   results <- lapply(trials, function(trial) {
     tryCatch(
       {
         val <- list(pi = NA, n_exits = NA, file = NA, aversive = NA, appetitive = NA)
-        path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial = trial, verbose = verbose)
+        path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial = trial, verbose = verbose, mm_decision_zone = mm_decision_zone)
         if (is.null(path)) {
           val
         } else {
