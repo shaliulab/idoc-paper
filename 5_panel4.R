@@ -35,8 +35,6 @@ panel4_data <- data[
 ]
 panel4_data[, Training := factor(Training, levels = trainings)]
 
-data[Training=="6X_Massed", .(PRE_Reason, POST_Reason)]
-
 columns <- c(
   "Files", "idoc_folder", "PRE_ROI", "POST_ROI",
   "User", "Genotype", "experiment",
@@ -65,17 +63,17 @@ sleep_accum <- sleep_dataset$periods
 
 breaks <- behavr::hours(seq(4, 24, 2))
 panel4C <- ggplot() +
-  geom_line(
-    data = sleep_data[t >= behavr::hours(4) & t <= behavr::hours(24), ],
-    mapping = aes(x = t, y = mu, col = Training),
-    linewidth = 1
-  ) +
   ggetho::stat_ld_annotations(
     data = sleep_data[t >= behavr::hours(4) & t <= behavr::hours(24), ],
     mapping = aes(x = t, y = mu, col = Training),
     height=1, alpha=0.2
   ) +
- geom_errorbar(
+  geom_line(
+    data = sleep_data[t >= behavr::hours(4) & t <= behavr::hours(24), ],
+    mapping = aes(x = t, y = mu, col = Training),
+    linewidth = 1
+  ) +
+  geom_errorbar(
    data = sleep_data[t >= behavr::hours(4) & t <= behavr::hours(24), ],
    aes(x = t, fill = Training, ymin = mu - sem, ymax = mu + sem),
    linewidth = .5, col = "black", width=behavr:::hours(0.25)
@@ -89,7 +87,7 @@ panel4C <- ggplot() +
    name = "ZT", breaks = breaks,
    labels = (breaks %% behavr::hours(24)) / behavr::hours(1)
  ) +
- scale_color_manual(values = colors_panel4[1:4]) +
+ scale_color_manual(values = colors_panel4[1:length(all_levels)]) +
  scale_y_continuous(name = "Time asleep per\n30 min bin (min)", expand = expansion(add = c(0, 0))) +
  geom_signif(
    data = significance_data[Training == "No_training", ],
