@@ -1,20 +1,24 @@
 # IDOC methods paper
 
-Stores the follwing resources:
+Stores the following resources:
 
 * Metadata of flies used in any experiment: metadata collects biologically relevant information specific to each fly. Can be genotype, gender, treatments, etc
-* R notebooks: used to load the behavioral data associated to the flies provided in the metadata
-* .csv files: contain the PRE and POST readings of the flies provided in the metadata, and are produced by the R notebooks, or amount of sleep
-* Prism files: contain the instructions to generate the plots / graphs that illustrate the effect of treatments on the PRE and POST readings
+Files: `metadata.csv` and `metadata_etho.csv`
+
+* R notebook: `1_tidy_datav2.R.ipynb` reads the metadata and loads the IDOC data from the database. Saves a `tidy_data_wide.csv` file
+* R scripts: used to process the behavioral data associated to the flies provided in the metadata. Take `tidy_data_wide.csv` as input
 * .svg files: graphs
 
-Note: .csv and .svg files are stored in a separate drive (Google) and can be downloaded using dvc (data version control). Assuming you have:
+To generate graphs:
 
-1. dvc version 3.55.2 is installed
-2. access permissions to the Google Drive folder (TODO)
+1. Run the R notebook
 
-you can get these files by running
-
+2. Run the R scripts
 ```
-dvc pull
+bash generate_figures.sh
+```
+
+3. Combine with svg templates
+```
+bash combine_figures.sh
 ```
