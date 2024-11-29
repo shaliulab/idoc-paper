@@ -41,7 +41,7 @@ TREND_STATISTIC <- "average"
 colors_panel1 <- c(paired, unpaired, dunce, orco)
 colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr)
 colors_panel3 <- c(NS_6x_spaced, NS_6X_spaced_cxm, orb2_6x_spaced, orb2_20min)
-colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, paired, no_training)
+colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, no_training, "black")
 colors_panel5 <- c(NS_6x_spaced, zt05_11_sd)
 
 

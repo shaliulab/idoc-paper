@@ -111,7 +111,6 @@ design <- "
  AACC
  DDEE
  DDEE
- DDEE
  DDFF
  DDFF
  DDFF
@@ -125,6 +124,6 @@ gg <- template + template +
   plot_annotation(tag_levels = list(c(LETTERS[1:6]))) +
   plot_layout(design=design)
 gg
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.pdf"), width = 210, height = 297, unit = "mm")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.svg"), width = 210, height = 297, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.pdf"), width = 210, height = 277, unit = "mm")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig1/Figure_1.svg"), width = 210, height = 277, unit = "mm")
 gg
