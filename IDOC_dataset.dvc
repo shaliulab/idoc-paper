@@ -1,6 +1,0 @@
-outs:
-- md5: 74f0c646f2bd8fe7489792eb3dc9e6a0.dir
-  size: 3828520000
-  nfiles: 6255
-  hash: md5
-  path: IDOC_dataset
