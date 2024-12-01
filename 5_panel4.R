@@ -173,9 +173,14 @@ panel4D_all <- lapply(periods, function(period) {
 
 layout <- "
 AAABBBBB
-CCDDDEEE
 FFFFFFFF
+CCDDDEEE
 "
+
+bottom_height <- 2.5
+middle_height <- 2.2
+
+
 gg <- ggplot() +
   learning_plot_theme +
   ggplot() +
@@ -190,11 +195,11 @@ gg <- ggplot() +
     panel4C$gg +
     guides(color = "none", fill = "none") +
     theme(
-      plot.margin = unit(c(60, 0, 0, 0), "pt")
+      plot.margin = unit(c(0, 0, 30, 0), "pt")
     )
   ) +
   plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "F"))) +
-  plot_layout(design = layout, heights = c(3, 2.5, 2.2)) &
+  plot_layout(design = layout, heights = c(3, middle_height, bottom_height)) &
   theme(
     legend.position = "bottom"
   )
