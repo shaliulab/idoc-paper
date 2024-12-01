@@ -153,7 +153,7 @@ panel4D_all <- lapply(periods, function(period) {
     y_breaks = seq(0, 360, 60),
     geom = "violin+sina",
     text_hjust = 1,
-    text_vjust = 1.5,
+    text_vjust = 2.5,
     textsize = 4,
     angle_n = 45
   )
@@ -186,16 +186,16 @@ gg <- ggplot() +
   ggplot() +
   learning_plot_theme +
   panel4A$gg +
-  guides(color = "none", fill = "none") +
+  guides(color = "none", fill = "none") + theme(plot.margin = unit(c(0, 0, 30, 0), "pt")) +
   panel4D_all[[1]]$gg +
-  guides(color = "none", fill = "none") +
+  guides(color = "none", fill = "none") + theme(plot.margin = unit(c(0, 0, 30, 0), "pt")) +
   panel4D_all[[2]]$gg +
-  guides(color = "none", fill = "none") +
+  guides(color = "none", fill = "none") + theme(plot.margin = unit(c(0, 0, 30, 0), "pt")) +
   (
     panel4C$gg +
     guides(color = "none", fill = "none") +
     theme(
-      plot.margin = unit(c(0, 0, 30, 0), "pt")
+      plot.margin = unit(c(0, 0, 60, 0), "pt")
     )
   ) +
   plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "F"))) +
