@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 210 297"
+   width="216mm"
+   height="100mm"
+   viewBox="0 0 216 100"
    version="1.1"
    id="svg3013"
    inkscape:version="1.4 (86a8ad7, 2024-10-11)"
@@ -27,9 +27,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="4.5304436"
-     inkscape:cx="341.68839"
-     inkscape:cy="128.13315"
+     inkscape:zoom="0.56630545"
+     inkscape:cx="707.21551"
+     inkscape:cy="212.7827"
      inkscape:window-width="2560"
      inkscape:window-height="1369"
      inkscape:window-x="-8"
@@ -52,10 +52,10 @@
        enabled="true"
        visible="true" /></sodipodi:namedview><defs
      id="defs3010"><rect
-       x="-59.999998"
+       x="-59.999996"
        y="-10"
        width="110"
-       height="60.000002"
+       height="60.000004"
        id="rect13" /><rect
        x="337.13049"
        y="131.10629"
@@ -189,7 +189,7 @@
        id="rect11" /><rect
        x="187.92041"
        y="29.657454"
-       width="79.958156"
+       width="79.958153"
        height="18.535194"
        id="rect21" /><rect
        x="-79.999992"
@@ -208,8 +208,8 @@
          ry="0.48180985" /></clipPath><rect
        x="582.75"
        y="37.75"
-       width="74.340381"
-       height="33.100062"
+       width="74.340378"
+       height="33.100063"
        id="rect393" /></defs><g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
@@ -226,7 +226,7 @@
          y="127.08102" /></text><image
        preserveAspectRatio="none"
        inkscape:svg-dpi="1000"
-       width="210.00442"
+       width="210.00443"
        height="99.998474"
        xlink:href="Figure_2.svg"
        id="image1"
@@ -413,7 +413,7 @@
          x="22.192778"
          y="53.685169">1 hr</tspan></text><path
        style="fill:none;stroke:#000000;stroke-width:0.423333;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 37.028531,53.529317 10.060241,0"
+       d="M 37.028531,53.529317 H 47.088772"
        id="path78222"
        inkscape:export-filename="C:\Users\u0127714\FlySleepLab Dropbox\Antonio\FSLLab\Presentations\2023-10-02_CSHL\schematic_02.png"
        inkscape:export-xdpi="300"
@@ -945,7 +945,7 @@
        y="87.609825"
        transform="rotate(-70.603007)" /><text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,26.172546,12.827418)"
+       transform="matrix(0.26458333,0,0,0.26458333,30.923788,13.02742)"
        id="text1-6"
        style="font-weight:bold;font-size:13.3333px;line-height:1.25;font-family:Calibri, Calibri_MSFontService, sans-serif;-inkscape-font-specification:'Calibri, Calibri_MSFontService, sans-serif, Bold';text-align:justify;white-space:pre;shape-inside:url(#rect34-7);display:inline"><tspan
          x="-80"

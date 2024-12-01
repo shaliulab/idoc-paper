@@ -1,14 +1,10 @@
 /idoc_metadata.ods
 /CHuiData.ods
 /dt_bin.RDS
-/tidy_data_wide.csv
-figures/
 .ipynb_checkpoints/
 1_CHui_tidy_data.R.ipynb
 1_tidy_data.R.ipynb
 /dt_bin_gtacr.RDS
-/metadata.csv
-/metadata_etho.csv
 idoc_metadata_backup.ods
 /IDOC_metadata_AOJ - metadata.csv
 CCC_Cs.csv
