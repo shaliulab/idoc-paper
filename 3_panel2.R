@@ -48,7 +48,6 @@ panel2A$annotation[group__ == "20min STM", t := behavr::mins(20)]
 panel2A$annotation[group__ == "1hr STM", t := behavr::hours(1)]
 panel2A$annotation[group__ == "3hr STM", t := behavr::hours(3)]
 panel2A$annotation[group__ == "24hr STM", t := behavr::hours(24)]
-#panel2A$annotation[, x := group__]
 
 ref_pi <- panel2A$annotation[test == "POST" & group__ == "20min STM", PI]
 df <- panel2A$annotation[test == "POST", .(x = group__, norm_PI = PI / ref_pi, std_error)]
@@ -56,7 +55,6 @@ ggplot(data = df, aes(x = x, y = norm_PI, group = 1)) +
   geom_line() +
   geom_point() +
   geom_errorbar(aes(x = x, ymin = norm_PI - std_error / ref_pi, ymax = norm_PI + std_error / ref_pi), width = .1) +
-  # scale_x_discrete(labels = c(0.3, 1, 3, 24), name = "Time after training (h)") +
   scale_x_discrete(labels = c(0.3, 1, 3, 24), "Time after training (h)") +
   scale_y_continuous(name = "STM %", breaks=c(0, .5, 1), labels=c(0, 50, 100)) +
   geom_hline(yintercept = 1, linetype = "dashed")

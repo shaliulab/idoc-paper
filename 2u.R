@@ -26,6 +26,8 @@ panel1_data$Group <- factor("2u", levels=c("2u"))
 panel1_data[, .(Files, id, POST, PRE_ROI, Group, experiment)]
 panel1_data_long <- melt_idoc_data(panel1_data)
 
+panel1_data[, .(n=.N, POST=mean(POST)), by=.(CS, Files)]
+
 # data.table::fwrite(
 #   x = panel1_data[, .(Files, PRE_ROI, POST_ROI, PRE, POST, Genotype, experiment)],
 #   file = "2u_metadata.csv"
@@ -34,7 +36,7 @@ panel1A <- learning_plot(
   panel1_data_long[, .(id, PI, test, Group)],
   "Group",
   direction = "horizontal",
-  y_annotation = 1.2,
+  y_annotation = 1,
   y_limits = c(-1, 1),
   y_breaks = seq(-1, 1, 0.5),
   text_vjust = 1.5,

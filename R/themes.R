@@ -6,7 +6,6 @@ sleep_plot_theme <- theme_prism() + theme(
   axis.title = element_text(size = TITLE_SIZE),
   axis.text.y = element_text(size = TEXT_SIZE),
   strip.text = element_blank(),
-  # plot.tag = element_text(size = PLOT_TAG_SIZE, vjust = +3),
   plot.tag = element_blank(),
   legend.key.width = unit(1, "null"),
   legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE)
@@ -16,6 +15,7 @@ learning_plot_theme <- sleep_plot_theme + theme(
   axis.title.x = element_blank(),
   axis.ticks.x = element_blank(),
   axis.text.x = element_blank(),
-  axis.line.x = element_blank()
+  axis.line.x = element_blank(),
+  panel.spacing=unit(0, "npc")
 )
 summary_plot_theme <- learning_plot_theme

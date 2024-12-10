@@ -77,6 +77,7 @@ learning_plot <- function(
       color = distribution_color,
       linewidth = linewidth
     )
+  # browser()
   panel <- add_trend_geom(
     panel, annotation_df,
     colors = colors,
@@ -97,7 +98,7 @@ learning_plot <- function(
   panel <- add_facet(panel, direction)
   panel <- panel +
     scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0))) +
-    scale_x_discrete(expand = expansion(add=c(.1,.1)))
+    scale_x_continuous(expand = expansion(add=c(0,0)))
   
 
   if (!is.null(test)) {
@@ -152,22 +153,7 @@ add_trend_geom <- function(
   annotation_df[, margin := margin]
   annotation_df[, ymin := ifelse((PI - error) < (PI - margin), (PI - error), (PI - margin))]
   annotation_df[, ymax := ifelse((PI + error) > (PI + margin), (PI + error), (PI + margin))]
-  
-  print(annotation_df)
-  # panel <- panel +
-  #   geom_errorbar(
-  #     data = annotation_df,
-  #     aes(
-  #       x = x, y = PI,
-  #       ymin = ymin,
-  #       ymax = ymax,
-  #       # width = errorbar_width * N,
-  #       # color = group__,
-  #       group = group__
-  #     ),
-  #     width = errorbar_width,
-  #     linewidth = 1
-  #   )
+
   
   if (is.null(colors)) {
     panel <- panel +
@@ -219,13 +205,17 @@ add_trend_geom <- function(
   return(panel)
 }
 
-add_significance_marks <- function(panel, test, annotation_df, y_annotation, vjust, textsize, map_signif_level, family) {
+add_significance_marks <- function(
+    panel, test, annotation_df, y_annotation,
+    vjust, textsize, map_signif_level, family
+  ) {
   group__ <- estimate <- p <- NULL
 
   if (map_signif_level) {
     panel <- panel + geom_signif(
       data = annotation_df,
-      aes(annotations = stars), xmin = 1, xmax = 2,
+      mapping = aes(annotations = stars),
+      xmin = 1, xmax = 2,
       y_position = y_annotation, test = test,
       manual = TRUE, tip_length = 0,
       family = family, vjust = vjust,
@@ -234,7 +224,8 @@ add_significance_marks <- function(panel, test, annotation_df, y_annotation, vju
   } else {
     panel <- panel + geom_signif(
       data = annotation_df,
-      aes(annotations = p), xmin = 1, xmax = 2,
+      mapping = aes(annotations = p),
+      xmin = 1, xmax = 2,
       y_position = y_annotation, test = test,
       manual = TRUE, tip_length = 0,
       family = family, vjust = vjust

@@ -79,7 +79,7 @@ panelB <- panel3B$gg +
 
 design <- "
 #########
-AAAA##BBB
+AAAA#BBBB
 #########
 CCCC#####
 "
@@ -96,12 +96,30 @@ gg <- ggplot() +
 gg
 
 
-
 suppressWarnings({
   ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.pdf"), width = 210, height = 280, units = "mm")
   ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.svg"), width = 210, height = 280, units = "mm")
   print(gg)
 })
+
+# design <- "
+# #########
+# AAAA#BBBB
+# #########
+# #####CCCC
+# "
+# gg <- ggplot() +
+#   learning_plot_theme +
+#   panelA +
+#   panelB  +
+#   plot_annotation(tag_levels = list(c("A", "B", "C"))) +
+#   plot_layout(design = design, heights = c(.4, 1, 1, 1)) &
+#   theme(
+#     legend.position = "bottom",
+#     legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
+#   )
+# gg
+
 
 
 

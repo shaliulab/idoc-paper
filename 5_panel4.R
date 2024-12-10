@@ -11,9 +11,9 @@ source("5_1_panel4_sleep_data.R")
 source("5_2_panel4_sleep_data.R")
 
 
-experiments <- c("24hr LTM", "24hr STM")
+experiments <- c("24hr LTM")
 trainings <- c("6X_Massed", "6X_Spaced")
-genotypes <- c("Iso31", "MB010B.(II)SPARC-Chrimson ISO", "MB010B.(II)SPARC-GFP ISO")
+genotypes <- c("Iso31")
 intervals <- c("No_stimulator")
 valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
 periods <- list(
@@ -23,7 +23,7 @@ periods <- list(
 load_ethoscope_data_for_idoc_paper(c("No_training", trainings))
 
 data <- data.table::fread(file = "tidy_data_wide.csv")
-
+data[, date := as.character(date)]
 panel4_data <- data[
   PRE_Reason %in% valid_reasons &
     POST_Reason %in% valid_reasons &
@@ -41,7 +41,29 @@ columns <- c(
   "PRE", "POST", "SD_status", "interval"
 )
 export_csvs(panel4_data, "Training", trainings, "4A", columns)
+
+
+sleep_dataset <- process_sleep_dataset(panel4_data, periods, trainings)
+sleep_data <- sleep_dataset$data
+significance_data <- sleep_dataset$significance
+sleep_accum <- sleep_dataset$periods
+
+sleep_accum[, date := as.character(substr(id, 1, 10))]
+sleep_accum[, machine_name := paste0("ETHOSCOPE_", as.character(substr(id, 21, 23)))]
+sleep_accum[, region_id := as.integer(substr(id, 28, 29))]
+
+ethoscope_index <- unique(sleep_accum[, .(machine_name, date, region_id)])
+
+# only use flies for which we have ethoscope data
+panel4_data <- merge(
+  panel4_data,
+  ethoscope_index,
+  by=c("region_id", "machine_name", "date"),
+  all.x=FALSE, all.y=FALSE
+)
+
 panel4_data_long <- melt_idoc_data(panel4_data)
+
 
 panel4A <- learning_plot(
   data = panel4_data_long[Training %in% c("6X_Spaced", "6X_Massed"), ],
@@ -55,11 +77,6 @@ panel4A <- learning_plot(
   colors = colors_panel4[1:2]
 )
 panel4A$gg <- panel4A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
-
-sleep_dataset <- process_sleep_dataset(panel4_data, periods, trainings)
-sleep_data <- sleep_dataset$data
-significance_data <- sleep_dataset$significance
-sleep_accum <- sleep_dataset$periods
 
 breaks <- behavr::hours(seq(4, 24, 2))
 panel4C <- ggplot() +
@@ -172,9 +189,9 @@ panel4D_all <- lapply(periods, function(period) {
 })
 
 layout <- "
-AAABBBBB
-FFFFFFFF
-CCDDDEEE
+AAAAAAAABBBBBBBBBB
+#FFFFFFFFFFFFFFFFF
+CCCCCCDDDDDDEEEEEE
 "
 
 bottom_height <- 2.5
@@ -186,7 +203,10 @@ gg <- ggplot() +
   ggplot() +
   learning_plot_theme +
   panel4A$gg +
-  guides(color = "none", fill = "none") + theme(plot.margin = unit(c(0, 0, 30, 0), "pt")) +
+  guides(color = "none", fill = "none") + theme(
+    plot.margin = unit(c(0, 0, 30, 0), "pt"),
+    axis.title.y = element_blank()
+  ) +
   panel4D_all[[1]]$gg +
   guides(color = "none", fill = "none") + theme(plot.margin = unit(c(0, 0, 30, 0), "pt")) +
   panel4D_all[[2]]$gg +
@@ -195,7 +215,8 @@ gg <- ggplot() +
     panel4C$gg +
     guides(color = "none", fill = "none") +
     theme(
-      plot.margin = unit(c(0, 0, 60, 0), "pt")
+      plot.margin = unit(c(0, 0, 60, 0), "pt"),
+      axis.title.y = element_blank()
     )
   ) +
   plot_annotation(tag_levels = list(c("A", "B", "C", "D", "E", "F"))) +
@@ -205,5 +226,5 @@ gg <- ggplot() +
   )
 
 gg
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.pdf"), width = 210, height = 280, unit = "mm", dpi = "retina")
-ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.svg"), width = 210, height = 280, unit = "mm", dpi = "retina")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.pdf"), width = 190, height = 280, unit = "mm", dpi = "retina")
+ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig4/Figure_4.svg"), width = 190, height = 280, unit = "mm", dpi = "retina")

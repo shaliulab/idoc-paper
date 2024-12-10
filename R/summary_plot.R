@@ -26,7 +26,7 @@ preprocess_summary_data_postPI <- function(data, group, test, value.var = "PI") 
 }
 
 preprocess_function_default <- preprocess_summary_data_postPI
-y_axis_label_default <- "Post Conditioning PI"
+y_axis_label_default <- "Post-conditioning PI"
 
 # preprocess_function_default <- preprocess_summary_data_deltaPI
 # y_axis_label_default <- "ΔPI"
@@ -79,7 +79,7 @@ summary_plot <- function(
     upper = quantile(PI, 0.75),
     ymax = quantile(PI, percentile[2]),
     N = .N
-  ), by = group__]
+  ), by = .(group__)]
   for (grp in data_summ$group__) {
     data[group__ == grp & (PI < data_summ[group__ == grp, ymin] | PI > data_summ[group__ == grp, ymax]), outlier := TRUE]
   }
@@ -126,9 +126,9 @@ summary_plot <- function(
   )
 
   if (x_labels_angle == 0) {
-    gg <- gg + scale_x_discrete(name = "")
+    gg <- gg + scale_x_discrete(name = "", expand=expansion(add=c(0.5, 0.5)))
   } else {
-    gg <- gg + scale_x_discrete(name = "")
+    gg <- gg + scale_x_discrete(name = "", expand=expansion(add=c(0.5, 0.5)))
   }
 
   gg <- gg + scale_y_continuous(
@@ -167,7 +167,11 @@ summary_plot <- function(
       " Effect size: ", test_out$estimate
     ))
   }
-  gg <- gg + coord_cartesian(clip = "off", ylim = y_limits) + summary_plot_theme
+  gg <- gg + coord_cartesian(
+    clip = "off",
+    # xlim=0.5+c(0, length(unique(data_summ$group__))),
+    ylim = y_limits
+  ) + summary_plot_theme
 
   n_facets <- length(unique(data$group__))
   data$group__ <- NULL
