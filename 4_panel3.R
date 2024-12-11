@@ -42,6 +42,7 @@ panel3A <- learning_plot(
   panel3_data_long, "Group",
   y_limits = c(-1, 1),
   y_annotation = 1.3,
+  y_annotation_n = NULL,
   colors = colors_panel3,
   vjust = 0,
   text_hjust = 1,
@@ -59,6 +60,7 @@ panel3B <- summary_plot(
     c("24hr LTM-orb2", "20min STM-orb2")
   ),
   annotation_y = c(1, 1.2, 1),
+  y_annotation_n = NULL,
   y_limits = c(-1, 1),
   colors = colors_panel3,
   percentile = c(0.025, 0.975),
@@ -77,18 +79,55 @@ panelB <- panel3B$gg +
     values = colors_panel3
   )
 
+
+# Data setup
+orb2dq <- "orb2ΔQ"
+
+data <- data.table(
+  Group = rep(c("24 hr LTM", "20 min STM", "CXM", orb2dq), times = c(1, 2, 2, 2)),
+  x = c(1, 2, 2, 3, 3, 4, 4),
+  y = c(4, 4, 2, 4, 1, 3, 1)
+)
+data[, Group := factor(Group, levels=c(orb2dq, "CXM", "20min STM", "24hr LTM"))]
+
+make_schematic <- function(data, n=4, point_size=5) {
+  data <- data.table::copy(data)
+  data[, x := x*(n*2)/4-1]
+  gg <- ggplot(data, aes(x = x, y = y)) +
+    geom_point(size = point_size) + # Add points
+    scale_y_continuous(
+      expand = expansion(add=c(0.5, .5)),
+      limits = c(0, 4), breaks = 1:4,
+    ) +
+    theme_void() +
+    scale_x_continuous(limits=c(0, n*2), expand = expansion(add=c(0, 0))) +
+    theme(
+      axis.title = element_blank(),
+      axis.ticks = element_blank(),
+      strip.text.x = element_blank()
+    ) +
+    geom_hline(yintercept = 2:4-0.5, linetype = "solid", linewidth = 1) # Add horizontal lines
+  return(gg)
+}
+
+point_size<-3
+schematic1  <- make_schematic(data, n=4, point_size=point_size)
+schematic2  <- make_schematic(data, n=4, point_size=point_size)
+
+
 design <- "
 #########
 AAAA#BBBB
-#########
-CCCC#####
+#####CCCC
+DDDD#####
+EEEE#####
 "
-gg <- ggplot() +
-  learning_plot_theme +
-  panelA +
-  panelB  +
-  plot_annotation(tag_levels = list(c("A", "B", "C"))) +
-  plot_layout(design = design, heights = c(.4, 1, 1, 1)) &
+gg <- (ggplot() + learning_plot_theme) +
+  (panelA + theme(plot.margin = unit(c(0, 0, 0, 0), "pt"))) +
+  schematic1 + 
+  (panelB + theme(plot.margin = unit(c(0, 0, 0, 0), "pt"))) +
+  schematic2 +
+  plot_layout(design = design, heights = c(.4, 1, .3, 1, .3)) &
   theme(
     legend.position = "bottom",
     legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
@@ -97,8 +136,8 @@ gg
 
 
 suppressWarnings({
-  ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.pdf"), width = 210, height = 280, units = "mm")
-  ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.svg"), width = 210, height = 280, units = "mm")
+  ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.pdf"), width = 210, height = 290, units = "mm")
+  ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig3/Figure_3.svg"), width = 210, height = 290, units = "mm")
   print(gg)
 })
 
@@ -119,7 +158,6 @@ suppressWarnings({
 #     legend.text = ggtext::element_markdown(size = LEGEND_TEXT_SIZE, hjust = 0.5)
 #   )
 # gg
-
 
 
 

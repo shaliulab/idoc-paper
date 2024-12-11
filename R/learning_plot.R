@@ -85,16 +85,18 @@ learning_plot <- function(
     linewidth = linewidth_mean,
     ERRORBAR_WIDTH
   )
-  panel <- add_n_annotation(
-    panel, annotation_df,
-    text_vjust = text_vjust,
-    text_hjust = text_hjust,
-    textsize = textsize,
-    family = family,
-    x_annotation = x_annotation,
-    y_annotation = y_annotation_n,
-    angle = angle_n
-  )
+  if (!is.null(y_annotation_n)) {
+    panel <- add_n_annotation(
+      panel, annotation_df,
+      text_vjust = text_vjust,
+      text_hjust = text_hjust,
+      textsize = textsize,
+      family = family,
+      x_annotation = x_annotation,
+      y_annotation = y_annotation_n,
+      angle = angle_n
+    )
+  }
   panel <- add_facet(panel, direction)
   panel <- panel +
     scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0))) +

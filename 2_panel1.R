@@ -63,6 +63,22 @@ export_csvs(panel1_data, "Group", groups, 1, columns)
 
 panel1_data_long <- melt_idoc_data(panel1_data)[, .(Group, id, PI, test, Genotype, CS)]
 
+panel1_data_long_by_user <- panel1_data[Genotype%in%genotypes & experiment ==  "20min STM",]
+panel1_data_long_by_user <- melt_idoc_data(panel1_data_long_by_user)[, .(Group, id, PI, test, Genotype, CS, User)]
+
+panel1A_user <- learning_plot(
+  panel1_data_long_by_user,
+  "User",
+  direction = "horizontal",
+  y_annotation = 1,
+  colors = colors_panel1[1:length(unique(panel1_data_long_by_user$User))],
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  text_vjust = 1.5,
+  angle_n = 0,
+  offset=0.25
+)
+
 # panel1_data_long <- rbind(
 #   panel1_data_long,
 #   data.table(

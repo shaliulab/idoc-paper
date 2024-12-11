@@ -112,18 +112,20 @@ summary_plot <- function(
       scale_color_manual(values = colors) +
       scale_fill_manual(values = colors)
   }
-
-  gg <- add_n_annotation(
-    gg,
-    data_summ,
-    x_annotation = NULL,
-    y_annotation = y_annotation_n,
-    text_vjust = text_vjust,
-    text_hjust = text_hjust,
-    family = family,
-    textsize = textsize,
-    angle = angle_n
-  )
+  if (!is.null(y_annotation_n)) {
+      
+    gg <- add_n_annotation(
+      gg,
+      data_summ,
+      x_annotation = NULL,
+      y_annotation = y_annotation_n,
+      text_vjust = text_vjust,
+      text_hjust = text_hjust,
+      family = family,
+      textsize = textsize,
+      angle = angle_n
+    )
+  }
 
   if (x_labels_angle == 0) {
     gg <- gg + scale_x_discrete(name = "", expand=expansion(add=c(0.5, 0.5)))
