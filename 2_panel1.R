@@ -36,6 +36,9 @@ panel1_data <- panel1_data[
 ]
 panel1_data[, Group := factor(Group, levels = groups_in_figure_1)]
 
+
+panel1_data[experiment=="20min STM unpaired", .(Files, PRE_ROI)]
+
 columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "Genotype", "experiment", "CS", "PRE", "POST")
 export_csvs(panel1_data, "Group", groups, 1, columns)
 
@@ -93,10 +96,8 @@ design <- "
 gg <- template + template +
   template + template +
   (panelA + 
-     # geom_vline(xintercept = 1.5) +
      theme(plot.margin = unit(c(0, 0, 40, 0), "pt"))) + 
   (panelB + 
-     # geom_vline(xintercept = c(1, 2)) 
      theme(plot.margin = unit(c(30, 0, 0, 0), "pt"))) + 
   plot_annotation(tag_levels = list(c(LETTERS[1:6]))) +
   plot_layout(design=design)

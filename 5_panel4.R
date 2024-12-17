@@ -7,12 +7,14 @@ source("R/themes.R", local = T)
 source("R/learning_plot.R", local = T)
 source("R/summary_plot.R", local = T)
 source("R/prism_compat.R", local = T)
-source("5_1_panel4_sleep_data.R")
-source("5_2_panel4_sleep_data.R")
+source("5_1_panel4_sleep_data.R", local = T)
+source("5_2_panel4_sleep_data.R", local = T)
 
 
 experiments <- c("24hr LTM")
 trainings <- c("6X_Massed", "6X_Spaced")
+all_levels <- c(trainings, "No_training")
+
 genotypes <- c("Iso31")
 intervals <- c("No_stimulator")
 valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
@@ -20,7 +22,6 @@ periods <- list(
   c(5, 11),
   c(12, 18)
 )
-load_ethoscope_data_for_idoc_paper(c("No_training", trainings))
 
 data <- data.table::fread(file = "tidy_data_wide.csv")
 data[, date := as.character(date)]
@@ -43,7 +44,9 @@ columns <- c(
 export_csvs(panel4_data, "Training", trainings, "4A", columns)
 
 
-sleep_dataset <- process_sleep_dataset(panel4_data, periods, trainings)
+dt_bin <- load_ethoscope_data_fig4()
+sleep_dataset <- process_sleep_dataset_fig4(panel4_data, periods, all_levels, dt_bin)
+
 sleep_data <- sleep_dataset$data
 significance_data <- sleep_dataset$significance
 sleep_accum <- sleep_dataset$periods
@@ -51,7 +54,6 @@ sleep_accum <- sleep_dataset$periods
 panel4_data <- keep_only_with_ethoscope_data(panel4_data, sleep_accum)
 panel4_data_long <- melt_idoc_data(panel4_data)
 
-all_levels <- c(trainings, "No_training")
 
 panel4A <- learning_plot(
   data = panel4_data_long[Training %in% c("6X_Spaced", "6X_Massed"), ],
@@ -131,6 +133,7 @@ spaced_data <- merge(sleep_spaced, learning_spaced, by = c("Files", "PRE_ROI", "
 ggplot(data=spaced_data, mapping = aes(x=asleep, y = POST)) + geom_point() + geom_smooth(method="lm") + labs(y="POST PI")
 
 
+y_max <- 360
 panel4D_all <- lapply(periods, function(period) {
   period_str <- paste0(
     "ZT",
@@ -144,18 +147,18 @@ panel4D_all <- lapply(periods, function(period) {
     data = df,
     group = "Training",
     comparisons = list(
-      c("6X_Massed", "6X_Spaced"),
-      c("No_training", "6X_Spaced"),
+      c("6X_Spaced", "6X_Massed"),
+      c("6X_Spaced", "No_training"),
       c("No_training", "6X_Massed")
     ),
     map_signif_level = T,
-    annotation_y = c(275, 255, 305) + 80,
+    annotation_y = c(375, 355, 415),
     colors = colors_panel4[1:length(all_levels)],
-    y_limits = c(0, 360),
+    y_limits = c(0, y_max),
     percentile = c(0.025, 0.975),
     preprocess_function = preprocess_function,
     y_axis_label = paste0(period_str, " sleep (min)"),
-    y_breaks = seq(0, 360, 60),
+    y_breaks = seq(0, y_max, 60),
     geom = "violin+sina",
     text_hjust = 1,
     text_vjust = 2.5,

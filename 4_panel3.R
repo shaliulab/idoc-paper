@@ -19,6 +19,8 @@ data <- data[
     POST_Reason %in% valid_reasons &
     interval == "No_stimulator",
 ]
+
+data[experiment == "24hr LTM inChamber", experiment := "24hr LTM"]
 data <- data[food == "cornmeal" | (food == "NONE" & experiment == "20min STM")]
 panel3_data <- data[(
   experiment %in% c("24hr LTM", "24hr LTM CXM") &
@@ -33,6 +35,8 @@ groups <- c("24hr LTM-Iso31", "24hr LTM CXM-Iso31", "24hr LTM-orb2", "20min STM-
 panel3_data[, Group := paste(experiment, ifelse(Genotype == "orb2", "orb2", "Iso31"), sep = "-")]
 panel3_data[, Group := factor(Group, levels = groups)]
 
+panel3_data[experiment=="24hr LTM", .(n=.N, dPOST=mean(POST-PRE)), by=.(Genotype, Files)]
+
 columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "User", "SD_status", "interval", "Genotype", "experiment", "PRE", "POST")
 export_csvs(panel3_data, "Group", groups, 3, columns)
 
@@ -43,7 +47,8 @@ panel3_data_long <- melt_idoc_data(panel3_data)
 
 
 panel3A <- learning_plot(
-  panel3_data_long, "Group",
+  panel3_data_long[substr(Files, 1, 10)=="2024-12-16"],
+  "Group",
   y_limits = c(-1, 1),
   y_annotation = 1.3,
   y_annotation_n = NULL,

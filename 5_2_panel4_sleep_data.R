@@ -1,9 +1,9 @@
-process_sleep_dataset <- function(panel4_data, periods, trainings) {
-  dt_bin <- readRDS("dt_bin.RDS")
+process_sleep_dataset_fig4 <- function(data, periods, trainings, dt_bin) {
+
   metadata_no_training <- dt_bin[, meta = T][PRE_ROI == "NONE", ]
   metadata <- dt_bin[, meta = T][PRE_ROI != "NONE", ]
   metadata <- merge(
-    panel4_data[, .(Files, PRE_ROI = as.character(PRE_ROI), POST_ROI = as.character(POST_ROI))],
+    data[, .(Files, PRE_ROI = as.character(PRE_ROI), POST_ROI = as.character(POST_ROI))],
     metadata,
     by = c("Files", "PRE_ROI", "POST_ROI"), all.x = TRUE, all.y = FALSE
   )
@@ -60,7 +60,7 @@ process_sleep_dataset <- function(panel4_data, periods, trainings) {
     return(sd(x) / sqrt(length(x)))
   }
   summ_data <- dt_bin_full[, .(id, t, asleep, Training)][, .(mu = mean(asleep), sem = sem(asleep)), by = .(t, Training)]
-  summ_data$Training <- factor(as.character(summ_data$Training), levels = c(trainings, "No_training"))
+  summ_data$Training <- factor(as.character(summ_data$Training), levels = trainings)
   winner <- summ_data[Training != "6X_Spaced", .(Training = .SD[which.max(mu), Training]), by = t]
   winner$winner <- TRUE
   test_out <- merge(
@@ -72,13 +72,15 @@ process_sleep_dataset <- function(panel4_data, periods, trainings) {
   test_out[is.na(winner), winner := FALSE]
   test_out$symbol <- ""
   test_out$symbol_ml <- ""
+
+  alphas <- c(0.05, 0.01, 0.005)
   
-  test_out[p < 0.05, symbol := "*"]
-  test_out[p < 0.01, symbol := "**"]
-  test_out[p < 0.005, symbol := "***"]
-  test_out[p < 0.05, symbol_ml := "*"]
-  test_out[p < 0.01, symbol_ml := "*\n*"]
-  test_out[p < 0.005, symbol_ml := "*\n*\n*"]
+  test_out[p < alphas[1], symbol := "*"]
+  test_out[p < alphas[2], symbol := "**"]
+  test_out[p < alphas[3], symbol := "***"]
+  test_out[p < alphas[1], symbol_ml := "*"]
+  test_out[p < alphas[2], symbol_ml := "*\n*"]
+  test_out[p < alphas[3], symbol_ml := "*\n*\n*"]
   
   test_out[, zt := t / behavr::hours(1)]
 

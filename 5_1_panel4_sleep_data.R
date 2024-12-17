@@ -14,7 +14,10 @@ parse_interval <- function(intervals, idx) {
   return(x)
 }
 
-load_ethoscope_data_for_idoc_paper <- function(trainings) {
+load_metadata_fig4 <- function() {
+
+  trainings <- c("6X_Massed", "6X_Spaced", "No_training")
+ 
   metadata <- data.table::fread("metadata.csv")
   metadata <- metadata[experiment %in% c("24hr LTM", "24hr LTM GTACR", "24hr STM"), ]
   metadata <- metadata[!is.na(date), ]
@@ -37,6 +40,13 @@ load_ethoscope_data_for_idoc_paper <- function(trainings) {
   metadata[interval != "No_stimulator", interval1 := parse_interval(interactor_time_window, 1)]
   metadata[interval != "No_stimulator", interval2 := parse_interval(interactor_time_window, 2)]
   metadata$date <- as.character(metadata$date)
+
+  return(metadata)
+}
+
+load_ethoscope_data_fig4 <- function() {
+
+  metadata <- load_metadata_fig4()
 
   metadata_linked <- scopr::link_ethoscope_metadata(metadata, result_dir = "/ethoscope_data/results")
   dt <- scopr::load_ethoscope(
@@ -61,4 +71,5 @@ load_ethoscope_data_for_idoc_paper <- function(trainings) {
   ggplot(data = behavr::rejoin(dt_bin)[Genotype == "Iso31" & interactor == "DefaultStimulator", ], aes(x = t, y = asleep, color = Training)) +
     stat_pop_etho() +
     scale_x_hours(name = "ZT")
+  return(dt_bin)
 }
