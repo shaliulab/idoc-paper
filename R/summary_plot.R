@@ -39,7 +39,7 @@ mean_x <- function(groups, group) {
 summary_plot <- function(
     data, group, comparisons,
     annotation_y,
-    test = unpaired_t_test,
+    test = "unpaired",
     map_signif_level = TRUE,
     colors = NULL,
     x_labels_angle = 0,
@@ -65,6 +65,7 @@ summary_plot <- function(
   
   PI <- group__ <- . <- outlier <- N <- NULL
   stopifnot(length(comparisons) == length(annotation_y))
+  test <- get(paste0(test, "_wilcoxon_test"))
 
   data <- data.table::copy(data)
   data <- preprocess_function(

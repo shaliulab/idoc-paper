@@ -217,9 +217,10 @@ add_significance_marks <- function(
       xmin = xmin, xmax = xmax
     )
   } else {
+    print(head(annotation_df))
     panel <- panel + geom_signif(
       data = annotation_df,
-      mapping = aes(annotations = p, color=NULL, fill=NULL),
+      mapping = aes(annotations = paste0("< ", ceiling(p*100)/100), color=NULL, fill=NULL),
       y_position = y_annotation, test = test,
       manual = TRUE, tip_length = 0,
       family = family, vjust = vjust,

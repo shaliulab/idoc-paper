@@ -15,7 +15,7 @@ library(ggsignif)
 #'  @param group A column in the data frame data, see argument data 
 learning_plot <- function(
     data, group, direction = "horizontal",
-    test = paired_t_test,
+    test = "paired",
     map_signif_level = TRUE,
     y_limits = c(-1, 1),
     trend_statistic = TREND_STATISTIC,
@@ -52,6 +52,8 @@ learning_plot <- function(
   } else {
     data$group__ <- data$group__ <- data[[group]]
   }
+
+  test <- get(paste0(test, "_wilcoxon_test"))
 
   . <- std_error <- id <- annotations <- x <- PI <- group__ <- N <- NULL
 

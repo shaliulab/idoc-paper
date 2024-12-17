@@ -19,3 +19,13 @@ learning_plot_theme <- sleep_plot_theme + theme(
   panel.spacing=unit(0, "npc")
 )
 summary_plot_theme <- learning_plot_theme
+
+traces_plot_theme <- learning_plot_theme + theme(
+  axis.title.y=element_blank(),
+  axis.text.x = element_text(size = TEXT_SIZE*0.8),
+  axis.line.y = element_blank(),
+  axis.ticks.length=unit(.05, "cm"),
+  title = element_blank(),
+  strip.text = element_blank(),
+  panel.border = element_rect(colour = "black", fill=NA, linewidth=1)
+)
