@@ -104,3 +104,14 @@ for (i in 1:nrow(index)) {
   post_session <- rev(unlist(strsplit(index[i, POST_files[[1]]], split = "/")))[3]
   copy_experiment_folder(idoc_folder, dest_folder, pre_session, post_session, mm_decision_zone = mm_decision_zone, dry_run = dry_run)
 }
+
+
+ethoscope_files <- yaml::read_yaml("figures/paper/Fig4/fig4_ethoscope_database.yaml")
+dir.create("ethoscope_data/results", recursive = TRUE, showWarnings = FALSE)
+for (dbfile in ethoscope_files) {
+  dest <- file.path("./", dbfile)
+  dest_dir <- dirname(dest)
+  dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
+  file.copy(dbfile, dest)
+  print(paste0(dbfile, " --> ", dest))
+}
