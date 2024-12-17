@@ -31,6 +31,11 @@ y_axis_label_default <- "Post-conditioning PI"
 # preprocess_function_default <- preprocess_summary_data_deltaPI
 # y_axis_label_default <- "ΔPI"
 
+mean_x <- function(groups, group) {
+  pos <- which(group == groups)
+  return(pos)
+}
+
 summary_plot <- function(
     data, group, comparisons,
     annotation_y,
@@ -54,7 +59,10 @@ summary_plot <- function(
     text_hjust = 0.5,
     text_vjust = 0,
     y_annotation_n = -1,
-    angle_n = 0) {
+    angle_n = 0,
+    correction = "bonferroni"
+  ) {
+  
   PI <- group__ <- . <- outlier <- N <- NULL
   stopifnot(length(comparisons) == length(annotation_y))
 
@@ -72,6 +80,7 @@ summary_plot <- function(
   } else {
     gg <- ggplot(data = data, aes(x = group__, y = PI))
   }
+
   data_summ <- data[, .(
     ymin = quantile(PI, percentile[1]),
     lower = quantile(PI, 0.25),
@@ -83,6 +92,12 @@ summary_plot <- function(
   for (grp in data_summ$group__) {
     data[group__ == grp & (PI < data_summ[group__ == grp, ymin] | PI > data_summ[group__ == grp, ymax]), outlier := TRUE]
   }
+
+
+  test_results_df <- make_annotation_df_boxplots(
+    data, comparisons,
+    correction = correction, test = test
+  )
 
   thickness <- 1.5
   if (geom == "boxplot") {
@@ -112,8 +127,8 @@ summary_plot <- function(
       scale_color_manual(values = colors) +
       scale_fill_manual(values = colors)
   }
+  gg <- gg + guides(color = "none", fill = "none")
   if (!is.null(y_annotation_n)) {
-      
     gg <- add_n_annotation(
       gg,
       data_summ,
@@ -138,37 +153,22 @@ summary_plot <- function(
     expand = expansion(add = c(0, 0))
   )
 
-  for (i in seq_along(comparisons)) {
-    comparison <- comparisons[[i]]
-    
-    n1 <- data_summ[group__ == comparison[1], N]
-    n2 <- data_summ[group__ == comparison[2], N]
-    if (n1 > 2 & n2 > 2) {
-      gg <- gg + geom_signif(
-        comparisons = list(comparison),
-        y_position = annotation_y[i],
-        map_signif_level = map_signif_level,
-        tip_length = 0,
-        test = test,
-        family = family,
-        vjust = vjust,
-        textsize = starsize,
-        size = 1
-      )
-      test_out <- test(
-        data[group__ == comparison[1], PI],
-        data[group__ == comparison[2], PI],
-        alternative = "greater"
-      )
-    } else {
-      test_out <- list(p.value = NA, estimate = NA)
-    }
-    print(paste0(
-      "Comparison ", paste(comparison, collapse = " vs "),
-      " P value: ", test_out$p.value,
-      " Effect size: ", test_out$estimate
-    ))
+  for (i  in 1:nrow(test_results_df)) {
+      gg <- panel <- tryCatch({
+        add_significance_marks(
+          gg, test, test_results_df[i, ], y_annotation = annotation_y[i],
+          map_signif_level = map_signif_level,
+          family = family, textsize = starsize, offset = 0,
+          xmin = test_results_df[i, xmin],
+          xmax = test_results_df[i, xmax],
+          vjust = vjust
+        )},
+        error = function(e) {
+          print(e)
+          return(panel)
+        })
   }
+
   gg <- gg + coord_cartesian(
     clip = "off",
     # xlim=0.5+c(0, length(unique(data_summ$group__))),

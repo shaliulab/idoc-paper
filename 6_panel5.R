@@ -22,10 +22,12 @@ panel5_data <- data[
     interval %in% intervals &
     experiment %in% experiments &
     Genotype %in% wild_types &
-    Training == "6X_Spaced" &
-    substr(Files, 1, 4) == "2023",
+    Training == "6X_Spaced"
 ]
 panel5_data[, interval := factor(interval, levels=intervals)]
+
+# panel5_data <- keep_only_with_ethoscope_data(panel5_data, sleep_accum)
+
 
 columns <- c(
   "Files", "idoc_folder", "PRE_ROI", "POST_ROI", "User",
@@ -41,13 +43,15 @@ panel5_data_long <- melt_idoc_data(panel5_data)
 panel5A <- learning_plot(
   panel5_data_long, "interval",
   map_signif_level = TRUE,
-  test = paired_t_test,
+  # test = paired_t_test,
+  test = paired_wilcoxon_test,
   colors = colors_panel5[1:length(intervals)],
   y_annotation = 1.1,
   y_limits = c(-1, 1),
   text_hjust = 1,
   text_vjust = 2.5,
-  textsize = 3
+  textsize = 3,
+  correction = "bonferroni"
 )
 panel5A$gg <- panel5A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
 
@@ -57,7 +61,8 @@ panel5B <- summary_plot(
     c("ZT05-ZT11", "No_stimulator")
   ),
   annotation_y = 1.1,
-  test = unpaired_t_test,
+  # test = unpaired_t_test,
+  test = unpaired_wilcoxon_test,
   colors = colors_panel5[1:length(intervals)],
   y_limits = c(-1, 1),
   percentile = c(0.025, 0.975),
@@ -66,7 +71,8 @@ panel5B <- summary_plot(
   textsize = 3,
   text_hjust = 1,
   text_vjust = 2.5,
-  angle_n = 45
+  angle_n = 45,
+  correction = "bonferroni"
 )
 design <- "ABC"
 gg <- plot_spacer() + plot_spacer() + plot_spacer() + ggplot() + learning_plot_theme + panel5A$gg + guides(color = "none") +
@@ -79,3 +85,4 @@ gg <- plot_spacer() + plot_spacer() + plot_spacer() + ggplot() + learning_plot_t
 gg
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.pdf"), width = 210, height = 100, unit = "mm", dpi="retina")
 ggsave(plot = gg, filename = paste0(OUTPUT_FOLDER, "/Fig5/Figure_5.svg"), width = 210, height = 100, unit = "mm", dpi="retina")
+`

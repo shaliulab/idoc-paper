@@ -48,22 +48,10 @@ sleep_data <- sleep_dataset$data
 significance_data <- sleep_dataset$significance
 sleep_accum <- sleep_dataset$periods
 
-sleep_accum[, date := as.character(substr(id, 1, 10))]
-sleep_accum[, machine_name := paste0("ETHOSCOPE_", as.character(substr(id, 21, 23)))]
-sleep_accum[, region_id := as.integer(substr(id, 28, 29))]
-
-ethoscope_index <- unique(sleep_accum[, .(machine_name, date, region_id)])
-
-# only use flies for which we have ethoscope data
-panel4_data <- merge(
-  panel4_data,
-  ethoscope_index,
-  by=c("region_id", "machine_name", "date"),
-  all.x=FALSE, all.y=FALSE
-)
-
+panel4_data <- keep_only_with_ethoscope_data(panel4_data, sleep_accum)
 panel4_data_long <- melt_idoc_data(panel4_data)
 
+all_levels <- c(trainings, "No_training")
 
 panel4A <- learning_plot(
   data = panel4_data_long[Training %in% c("6X_Spaced", "6X_Massed"), ],
@@ -74,7 +62,8 @@ panel4A <- learning_plot(
   text_vjust = +2.5,
   text_hjust = 1,
   textsize = 4,
-  colors = colors_panel4[1:2]
+  colors = colors_panel4[1:2],
+  correction = "bonferroni"
 )
 panel4A$gg <- panel4A$gg + scale_x_discrete(expand = expansion(add=c(.25,.25)))
 
@@ -124,7 +113,6 @@ panel4C
 panel4C <- list(gg = panel4C)
 
 
-all_levels <- c(trainings, "No_training")
 sleep_accum[, Training := factor(as.character(Training), levels = all_levels)]
 export_csvs(sleep_accum, "Training", all_levels, "4C", NULL, "asleep")
 
@@ -172,7 +160,8 @@ panel4D_all <- lapply(periods, function(period) {
     text_hjust = 1,
     text_vjust = 2.5,
     textsize = 4,
-    angle_n = 45
+    angle_n = 45,
+    correction = "bonferroni"
   )
 
   panel$gg <- panel$gg +

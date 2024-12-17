@@ -42,7 +42,8 @@ learning_plot <- function(
     vjust = VJUST,
     angle_n = 45,
     text_vjust = 0,
-    offset=0
+    offset = 0,
+    correction = NULL
     ) {
   if (is.null(group)) {
     df$group__ <- "A"
@@ -55,16 +56,19 @@ learning_plot <- function(
   . <- std_error <- id <- annotations <- x <- PI <- group__ <- N <- NULL
 
   group <- "group__"
+  stopifnot("id" %in% colnames(data))
 
   annotation_df <- make_annotation_df(
     df = data, variable = group,
     test = test,
     trend_statistic = trend_statistic,
     error_statistic = error_statistic,
+    correction = correction,
     alt = "greater"
   )
-  data$x <- ifelse(data$test == "PRE", 1+offset, 2-offset)
-  annotation_df$x <- ifelse(annotation_df$test == "PRE", 1+offset, 2-offset)
+  data[, x := ifelse(test == "PRE", 1+offset, 2-offset)]
+  annotation_df[, x := ifelse(test == "PRE", 1+offset, 2-offset)]
+  
   n_facets <- length(unique(data$group__))
 
   panel <- ggplot(data = data, aes(x = x, y = PI)) +
@@ -77,7 +81,7 @@ learning_plot <- function(
       color = distribution_color,
       linewidth = linewidth
     )
-  # browser()
+
   panel <- add_trend_geom(
     panel, annotation_df,
     colors = colors,
@@ -85,6 +89,7 @@ learning_plot <- function(
     linewidth = linewidth_mean,
     ERRORBAR_WIDTH
   )
+  
   if (!is.null(y_annotation_n)) {
     panel <- add_n_annotation(
       panel, annotation_df,
@@ -98,9 +103,7 @@ learning_plot <- function(
     )
   }
   panel <- add_facet(panel, direction)
-  panel <- panel +
-    scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0))) +
-    scale_x_continuous(expand = expansion(add=c(0,0)))
+  
   
 
   if (!is.null(test)) {
@@ -109,14 +112,19 @@ learning_plot <- function(
         panel, test, annotation_df, y_annotation, vjust,
         textsize = starsize,
         map_signif_level = map_signif_level,
-        family = family
+        family = family, offset = 0
       )},
       error = function(e) {
         print(e)
         return(panel)
     })
   }
-  panel <- panel + coord_cartesian(clip = "off", ylim = y_limits) + learning_plot_theme
+  
+  panel <- panel +
+    scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0))) +
+    scale_x_continuous(expand = expansion(add=c(0,0))) +
+    coord_cartesian(clip = "off", ylim = y_limits) +
+    learning_plot_theme
 
   data$group__ <- NULL
   return(list(
@@ -178,7 +186,7 @@ add_trend_geom <- function(
         size = point_size
       )
   } else {
-    stopifnot(length(colors) == length(unique(annotation_df$group__)))
+
     panel <- panel +
       geom_line(
         data = annotation_df,
@@ -198,53 +206,19 @@ add_trend_geom <- function(
           x = x, y = PI,
           group = group__
         )
-      ) +
-      scale_fill_manual(values = colors) +
+      )
+    if(length(colors) != length(unique(annotation_df$group__))) {
+      warning("Passed colors does not match number of facets")
+    } else {
+      panel <- panel + scale_fill_manual(values = colors) +
       scale_color_manual(values = colors)
+    }
   }
   
 
   return(panel)
 }
 
-add_significance_marks <- function(
-    panel, test, annotation_df, y_annotation,
-    vjust, textsize, map_signif_level, family
-  ) {
-  group__ <- estimate <- p <- NULL
-
-  if (map_signif_level) {
-    panel <- panel + geom_signif(
-      data = annotation_df,
-      mapping = aes(annotations = stars),
-      xmin = 1, xmax = 2,
-      y_position = y_annotation, test = test,
-      manual = TRUE, tip_length = 0,
-      family = family, vjust = vjust,
-      textsize = textsize, size = 1,
-    )
-  } else {
-    panel <- panel + geom_signif(
-      data = annotation_df,
-      mapping = aes(annotations = p),
-      xmin = 1, xmax = 2,
-      y_position = y_annotation, test = test,
-      manual = TRUE, tip_length = 0,
-      family = family, vjust = vjust
-    )
-  }
-
-  for (group in unique(annotation_df$group__)) {
-    p <- annotation_df[group__ == group, p]
-    estimate <- annotation_df[group__ == group, estimate][1]
-
-    print(paste0(
-      "Group ", group, " P value: ", p,
-      " Effect size: ", estimate
-    ))
-  }
-  return(panel)
-}
 
 
 

@@ -29,6 +29,7 @@ orco <- "brown"
 stm_20min <- "blue"
 stm_1hr <- "#90be6d"
 stm_3hr <- "#277da1"
+stm_24hr <- "gray"
 NS_6X_spaced_cxm <- "#f53542"
 orb2_6x_spaced <- "#2667ff"
 orb2_20min <- "#add7f6"
@@ -39,7 +40,7 @@ TREND_STATISTIC <- "average"
 
 
 colors_panel1 <- c(paired, unpaired, dunce, orco)
-colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr)
+colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr, stm_24hr)
 colors_panel3 <- c(NS_6x_spaced, NS_6X_spaced_cxm, orb2_6x_spaced, orb2_20min)
 colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, no_training, "black")
 colors_panel5 <- c(NS_6x_spaced, zt05_11_sd)

@@ -79,6 +79,7 @@ read_pi <- function(path, roi, min_exits = 3) {
   )
   if ("apetitive" %in% colnames(pis)) {
     pis[, appetitive := apetitive]
+    pis[, apetitive := NULL]
   }
   animal_data <- pis[region_id == roi, ]
   if (nrow(animal_data) == 0) {
@@ -99,15 +100,43 @@ read_pi <- function(path, roi, min_exits = 3) {
 }
 
 
-average_trial <- function(results, min_exits_per_trial, use_incomplete_tests) {
-  pis <- sapply(results, function(x) {
-    x$pi
-  })
-  pi <- mean(pis, na.rm = use_incomplete_tests)
-  n_exits <- sum(sapply(results, function(x) {
-    x$n_exits
-  }), na.rm = use_incomplete_tests)
+average_trial <- function(results, min_exits_per_trial, use_incomplete_tests, use_global=FALSE) {
+  n_na_trials <- sum(sapply(results, function(x) {
+    is.na(x$pi)
+  }))
+  
+  if (n_na_trials < 2) {
+
+    pis <- sapply(results, function(x) {
+      x$pi
+    })
+    pi <- mean(pis, na.rm = use_incomplete_tests)
+    n_exits <- sum(sapply(results, function(x) {
+      x$n_exits
+    }), na.rm = use_incomplete_tests)
+  } else if (use_global) {
+    out <- combined_trial(results)
+    n_exits <- out$n_exits
+    pi <- out$pi
+  } else {
+    pi<- NA
+    n_exits <- NA
+  }
+
   return(list(pi = pi, n_exits = n_exits))
+}
+
+combined_trial <- function(results) {
+  aversive <- sum(sapply(results, function(x) {
+    ifelse(length(x$aversive) == 0, 0, x$aversive)
+  }))
+  appetitive <- sum(sapply(results, function(x) {
+    ifelse(length(x$appetitive) == 0, 0, x$appetitive)
+  }))
+  n_exits <- aversive + appetitive
+  pi <- (appetitive - aversive) / n_exits
+  
+  return(list(pi=pi, n_exits=n_exits))
 }
 
 best_trial <- function(results, min_exits_per_trial, use_incomplete_tests) {
@@ -125,20 +154,14 @@ best_trial <- function(results, min_exits_per_trial, use_incomplete_tests) {
       x$n_exits
     })[i]
   } else {
-    aversive <- sum(sapply(results, function(x) {
-      ifelse(length(x$aversive) == 0, 0, x$aversive)
-    }))
-    appetitive <- sum(sapply(results, function(x) {
-      ifelse(length(x$appetitive) == 0, 0, x$appetitive)
-    }))
-    n_exits <- aversive + appetitive
-    pi <- (appetitive - aversive) / n_exits
+    out <- combined_trial(results)
+    n_exits <- out$n_exits
+    pi <- out$pi
   }
 
   if (!use_incomplete_tests & n_exits < min_exits_per_trial) {
     pi <- NA
   }
-
 
   return(list(pi = pi, n_exits = n_exits))
 }
@@ -147,13 +170,14 @@ read_pi_multitrial <- function(session_folder, test, idoc_folder, region_id, tri
   results <- lapply(trials, function(trial) {
     tryCatch(
       {
-        val <- list(pi = NA, n_exits = NA, file = NA, aversive = NA, appetitive = NA)
+        val <- list(pi = NA, n_exits = NA, file = NA, aversive = NA, appetitive = NA, region_id=region_id)
         path <- find_pi_file(session_folder, test, idoc_folder, region_id, trial = trial, verbose = verbose, mm_decision_zone = mm_decision_zone)
         if (is.null(path)) {
           val
         } else {
           val <- read_pi(path, region_id, min_exits = min_exits_per_trial)
           val$file <- path
+          val$region_id <- region_id
         }
         val
       },
