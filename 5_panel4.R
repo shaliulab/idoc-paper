@@ -32,7 +32,8 @@ panel4_data <- data[
     Genotype %in% genotypes &
     interval %in% intervals &
     experiment %in% experiments &
-    region_id != "NONE"
+    region_id != "NONE" &
+    US %in% c("75V 0Ω", "75V")
 ]
 panel4_data[, Training := factor(Training, levels = trainings)]
 
@@ -44,12 +45,20 @@ columns <- c(
 export_csvs(panel4_data, "Training", trainings, "4A", columns)
 
 
+panel4_data[, .N, by=Genotype]
+
 dt_bin <- load_ethoscope_data_fig4()
+yaml::write_yaml(
+  x = unique(sapply(dt_bin[, meta=TRUE]$file_info, function(fi) fi$path)),
+  file = file.path(OUTPUT_FOLDER, "Fig4/fig4_ethoscope_database.yaml")
+)
+
 sleep_dataset <- process_sleep_dataset_fig4(panel4_data, periods, all_levels, dt_bin)
 
 sleep_data <- sleep_dataset$data
 significance_data <- sleep_dataset$significance
 sleep_accum <- sleep_dataset$periods
+
 
 panel4_data <- keep_only_with_ethoscope_data(panel4_data, sleep_accum)
 panel4_data_long <- melt_idoc_data(panel4_data)
