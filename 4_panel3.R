@@ -45,9 +45,10 @@ panel3_data[, .(n=.N, POST=mean(POST), dPOST=mean(POST-PRE)), by=.(Group)]
 
 panel3_data_long <- melt_idoc_data(panel3_data)
 
+panel3_data[, .(n=.N, POST=mean(POST)), by=.(Group, Genotype)]
 
 panel3A <- learning_plot(
-  panel3_data_long[substr(Files, 1, 10)=="2024-12-16"],
+  panel3_data_long,
   "Group",
   y_limits = c(-1, 1),
   y_annotation = 1.3,
