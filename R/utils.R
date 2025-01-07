@@ -51,11 +51,14 @@ make_annotation_df <- function(df, variable, test, trend_statistic, error_statis
     if (length(x) < min_n_points | is.null(test)) {
       return(list(p.value = NA, estimate = NA))
     }
-    test(
+    out <- test(
       x = x,
       y = y,
       ...
     )
+    estim <- round(mean(y) - mean(x), 2)
+    out$estimate <- estim
+    out
   })
   p_values <- sapply(test_out, function(x) x$p.value)
   estimates <- sapply(test_out, function(x) x$estimate)
@@ -89,6 +92,7 @@ make_annotation_df <- function(df, variable, test, trend_statistic, error_statis
   stats_df$var__ <- NULL
   stats_df <- merge(annotation_df, stats_df, by = variable)
 
+  
   stats_df[, std_error := std / sqrt(N)]
   annotation_df$group__ <- annotation_df[[variable]]
 
@@ -96,7 +100,6 @@ make_annotation_df <- function(df, variable, test, trend_statistic, error_statis
   stopifnot(trend_statistic %in% colnames(stats_df))
   stats_df$error <- stats_df[[error_statistic]]
   stats_df$PI <- stats_df[[trend_statistic]]
-  
   return(stats_df)
 }
 
@@ -275,3 +278,33 @@ make_annotation_df_boxplots <- function(data, comparisons, correction, test) {
   return(test_results_df)
 }
 
+
+load_ethoscope_data <- function(metadata=NULL) {
+  
+  if (is.null(metadata)) metadata <- load_metadata_fig5()
+  
+  metadata_linked <- scopr::link_ethoscope_metadata(metadata, result_dir = "/ethoscope_data/results")
+  dt <- scopr::load_ethoscope(
+    metadata_linked,
+    verbose = FALSE,
+    reference_hour = NA,
+    cache = "/ethoscope_data/cache",
+    FUN = sleepr::sleep_annotation, velocity_correction_coef = 0.0048, time_window_length = 10, min_time_immobile = 300
+  )
+  dt_bin <- behavr::bin_apply_all(dt, y = "asleep", x_bin_length = behavr::mins(30), summary_FUN = mean)
+  dt_bin$asleep <- dt_bin$asleep * 30
+  metadata_linked <- dt_bin[, meta = TRUE]
+  
+  metadata_linked <- merge(
+    metadata_linked[, .(id, machine_name, date = as.character(substr(datetime, 1, 10)), region_id)],
+    metadata,
+    by = c("machine_name", "date", "region_id"), all = TRUE
+  )
+  setkey(metadata_linked, id)
+  setmeta(dt_bin, metadata_linked)
+  saveRDS(object = dt_bin, file = "dt_bin.RDS")
+  # ggplot(data = behavr::rejoin(dt_bin)[Genotype == "Iso31" & interactor == "DefaultStimulator", ], aes(x = t, y = asleep, color = Training)) +
+  #   stat_pop_etho() +
+  #   scale_x_hours(name = "ZT")
+  return(dt_bin)
+}

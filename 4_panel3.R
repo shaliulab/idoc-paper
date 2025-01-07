@@ -20,7 +20,8 @@ data <- data[
     interval == "No_stimulator",
 ]
 
-data[experiment == "24hr LTM inChamber", experiment := "24hr LTM"]
+# data[experiment == "24hr LTM inChamber", experiment := "24hr LTM"]
+
 data <- data[food == "cornmeal" | (food == "NONE" & experiment == "20min STM")]
 panel3_data <- data[(
   experiment %in% c("24hr LTM", "24hr LTM CXM") &
@@ -30,12 +31,15 @@ panel3_data <- data[(
   Genotype %in% "orb2"
 )]
 
+
 groups <- c("24hr LTM-Iso31", "24hr LTM CXM-Iso31", "24hr LTM-orb2", "20min STM-orb2")
 
 panel3_data[, Group := paste(experiment, ifelse(Genotype == "orb2", "orb2", "Iso31"), sep = "-")]
 panel3_data[, Group := factor(Group, levels = groups)]
-
 panel3_data[experiment=="24hr LTM", .(n=.N, dPOST=mean(POST-PRE)), by=.(Genotype, Files)]
+
+new_data <- panel3_data[substr(Files, 1, 9)=="2024-12-1",]
+
 
 columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "User", "SD_status", "interval", "Genotype", "experiment", "PRE", "POST")
 export_csvs(panel3_data, "Group", groups, 3, columns)
@@ -44,6 +48,21 @@ export_csvs(panel3_data, "Group", groups, 3, columns)
 panel3_data[, .(n=.N, POST=mean(POST), dPOST=mean(POST-PRE)), by=.(Group)]
 
 panel3_data_long <- melt_idoc_data(panel3_data)
+new_data_long <- melt_idoc_data(new_data)
+learning_plot(
+  new_data_long,
+  "Group",
+  y_limits = c(-1, 1),
+  y_annotation = 1.3,
+  y_annotation_n = NULL,
+  colors = colors_panel3,
+  vjust = 0,
+  text_hjust = 1,
+  text_vjust = 1,
+  textsize = 5,
+  point_size_mean = POINT_SIZE_MEAN*0.7,
+  offset = 0.15
+)
 
 panel3_data[, .(n=.N, POST=mean(POST)), by=.(Group, Genotype)]
 

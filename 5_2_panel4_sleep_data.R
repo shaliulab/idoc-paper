@@ -59,7 +59,9 @@ process_sleep_dataset_fig4 <- function(data, periods, trainings, dt_bin) {
   sem <- function(x) {
     return(sd(x) / sqrt(length(x)))
   }
-  summ_data <- dt_bin_full[, .(id, t, asleep, Training)][, .(mu = mean(asleep), sem = sem(asleep)), by = .(t, Training)]
+  dt_bin_full[, dbfile := sapply(file_info, function(fi) fi$path)]
+  
+  summ_data <- dt_bin_full[, .(id, t, asleep, Training, dbfile)][, .(mu = mean(asleep), sem = sem(asleep), n=length(unique(id)), N=length(unique(dbfile))), by = .(t, Training)]
   summ_data$Training <- factor(as.character(summ_data$Training), levels = trainings)
   winner <- summ_data[Training != "6X_Spaced", .(Training = .SD[which.max(mu), Training]), by = t]
   winner$winner <- TRUE

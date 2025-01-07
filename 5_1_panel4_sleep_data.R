@@ -58,12 +58,19 @@ load_ethoscope_data_fig4 <- function() {
   )
   dt_bin <- behavr::bin_apply_all(dt, y = "asleep", x_bin_length = behavr::mins(30), summary_FUN = mean)
   dt_bin$asleep <- dt_bin$asleep * 30
+  metadata_linked_orig <- data.table::copy(metadata_linked)
   metadata_linked <- dt_bin[, meta = TRUE]
 
   metadata_linked <- merge(
     metadata_linked[, .(id, machine_name, date = as.character(substr(datetime, 1, 10)), region_id)],
     metadata,
     by = c("machine_name", "date", "region_id"), all = TRUE
+  )
+
+  metadata_linked <- merge(
+    metadata_linked,
+    metadata_linked_orig[, .(id, file_info)],
+    by="id"
   )
   setkey(metadata_linked, id)
   setmeta(dt_bin, metadata_linked)

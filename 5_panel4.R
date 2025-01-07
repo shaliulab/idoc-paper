@@ -46,6 +46,8 @@ export_csvs(panel4_data, "Training", trainings, "4A", columns)
 
 
 panel4_data[, .N, by=Genotype]
+panel4_data[, .N, by=.(experiment, Files)]
+
 
 dt_bin <- load_ethoscope_data_fig4()
 yaml::write_yaml(
