@@ -45,12 +45,66 @@ export_csvs(panel1_data, "Group", groups, 1, columns)
 
 panel1_data_long <- melt_idoc_data(panel1_data)[, .(Files, Group, id, PI, test, Genotype, CS)]
 
+# data[substr(Files, 1, 7)=="2025-01", .(Files, Genotype, PRE_ROI, PRE, POST)]
 
-panel1_data[substr(Files, 1, 10)=="2025-01-06", .(Genotype, PRE_ROI, PRE, POST)]
+panel1_data[substr(Files, 1, 10)=="2025-01-07", .(PRE, POST, Genotype)]
+panel_orco <- learning_plot(
+  panel1_data_long[Files %in% panel1_data_long[Genotype=="orco 23129", unique(Files)],],
+  "Genotype",
+  direction = "horizontal",
+  y_annotation = 1,
+  colors = colors_panel1[1:length(groups)],
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  text_vjust = 1.5,
+  angle_n = 0,
+  offset = 0.25,
+  correction = "bonferroni"
+)
+learning_plot(
+  panel1_data_long[Files %in% panel1_data_long[Genotype=="orco 23129", unique(Files)],][Genotype=="orco 23129"],
+  "Files",
+  direction = "horizontal",
+  y_annotation = 1,
+  colors = colors_panel1[1:length(groups)],
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  text_vjust = 1.5,
+  angle_n = 0,
+  offset = 0.25,
+  correction = "bonferroni"
+)$gg / learning_plot(
+  panel1_data_long[Files %in% panel1_data_long[Genotype=="orco 23129", unique(Files)],][Genotype=="MB010B.(II)SPARC-GFP ISO"],
+  "Files",
+  direction = "horizontal",
+  y_annotation = 1,
+  colors = colors_panel1[1:length(groups)],
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  text_vjust = 1.5,
+  angle_n = 0,
+  offset = 0.25,
+  correction = "bonferroni"
+)$gg
+
 
 panel1A <- learning_plot(
-  panel1_data_long,#[substr(Files, 1, 10)=="2025-01-06",],
+  panel1_data_long,
   "Group",
+  direction = "horizontal",
+  y_annotation = 1,
+  colors = colors_panel1[1:length(groups)],
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  text_vjust = 1.5,
+  angle_n = 0,
+  offset = 0.25,
+  correction = "bonferroni"
+)
+
+panel4M1O <- learning_plot(
+  panel1_data_long[CS=="4M1O",],
+  "Files",
   direction = "horizontal",
   y_annotation = 1,
   colors = colors_panel1[1:length(groups)],

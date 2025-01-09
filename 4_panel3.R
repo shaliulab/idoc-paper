@@ -10,6 +10,9 @@ source("4_panel3_schematic.R", local = T)
 
 data <- data.table::fread(file = "tidy_data_wide.csv")
 
+data[User == "CH" & Genotype=="MB010B.(II)SPARC-GFP ISO",]$experiment
+data[User == "CH", .N, by=.(experiment, Genotype)]
+
 wild_types <- c("Iso31", "MB010B.(II)SPARC-Chrimson ISO", "MB010B.(II)SPARC-GFP ISO")
 experiments <- c("24hr LTM", "24hr LTM CXM", "20min STM")
 valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
@@ -38,8 +41,6 @@ panel3_data[, Group := paste(experiment, ifelse(Genotype == "orb2", "orb2", "Iso
 panel3_data[, Group := factor(Group, levels = groups)]
 panel3_data[experiment=="24hr LTM", .(n=.N, dPOST=mean(POST-PRE)), by=.(Genotype, Files)]
 
-new_data <- panel3_data[substr(Files, 1, 9)=="2024-12-1",]
-
 
 columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "User", "SD_status", "interval", "Genotype", "experiment", "PRE", "POST")
 export_csvs(panel3_data, "Group", groups, 3, columns)
@@ -48,10 +49,10 @@ export_csvs(panel3_data, "Group", groups, 3, columns)
 panel3_data[, .(n=.N, POST=mean(POST), dPOST=mean(POST-PRE)), by=.(Group)]
 
 panel3_data_long <- melt_idoc_data(panel3_data)
-new_data_long <- melt_idoc_data(new_data)
 learning_plot(
-  new_data_long,
-  "Group",
+  panel3_data_long[User=="CH" & experiment=="24hr LTM",],
+  # panel3_data_long[User=="CH" & experiment=="24hr LTM" & POST_Reason=="",],
+  "Genotype",
   y_limits = c(-1, 1),
   y_annotation = 1.3,
   y_annotation_n = NULL,
