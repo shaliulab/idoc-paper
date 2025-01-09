@@ -1,4 +1,4 @@
-library(idocr2)
+library(idocr)
 library(dplyr)
 library(ggplot2)
 library(cowplot)
@@ -10,7 +10,10 @@ working_directory <- args[1]
 experiment_folder <- args[2]
 test <- args[3]
 print(args)
+wd <- getwd()
 
+
+source("scripts/analyze_session_lib.R")
 
 script_name <- tryCatch(
   scriptName::current_filename(),
@@ -29,63 +32,10 @@ src_file <- tryCatch(
   }
 )
 
-stopifnot(file.exists(src_file))
+# stopifnot(file.exists(src_file))
 
 setwd(working_directory)
 
-
-get_path_to_default_roi_centers <- function(machine_name) {
-  return(
-    file.path("~/opt/idocr/inst/roi_centers", machine_name, "ROI_CENTER.csv")
-  )
-}
-
-write_analysis_params <- function(machine_name) {
-  configs <- list(
-    IDOC_001 = list(
-      pixel_to_mm_ratio = 2.3,
-      limits = c(-70, 70)
-    ),
-    IDOC_002 = list(
-      pixel_to_mm_ratio = 6.16,
-      limits = c(-155, 155)
-    )
-  )
-  config <- configs[[machine_name]]
-  yaml::write_yaml(x = config, file = "analysis_params.yaml")
-}
-
-get_suffix <- function(working_directory, experiment_folder) {
-  experiment_dir <- file.path(working_directory, experiment_folder)
-  meta_file <- grep(x = list.files(experiment_dir), pattern = "METADATA.csv", value = TRUE)
-  stopifnot(length(meta_file) == 1)
-  suffix <- substr(meta_file, 21, 52)
-  return(suffix)
-}
-get_machine_name <- function(working_directory, experiment_folder) {
-  machine_names <- c(
-    "7eb8e224bdb944a68825986bc70de6b1" = "IDOC_001",
-    "74f75f830109411ba67f74ecb268f9ef" = "IDOC_002"
-  )
-  suffix <- get_suffix(working_directory, experiment_folder)
-
-  machine_name <- machine_names[suffix]
-  return(machine_name)
-}
-
-use_default_roi_centers <- function(working_directory, experiment_folder) {
-  suffix <- get_suffix(working_directory, experiment_folder)
-  experiment_dir <- file.path(working_directory, experiment_folder)
-  dest_path <- file.path(experiment_dir, paste0(experiment_folder, "_", suffix, "_ROI_CENTER.csv"))
-  stopifnot(!file.exists(dest_path))
-  machine_name <- get_machine_name(working_directory, experiment_folder)
-  src_path <- get_path_to_default_roi_centers(machine_name)
-  file.copy(
-    src_path,
-    dest_path
-  )
-  print(paste0(src_path, " --> ", dest_path))
-}
 
 machine_name <- get_machine_name(working_directory, experiment_folder)
 write_analysis_params(machine_name)
@@ -141,8 +91,8 @@ border_mm <- 5
 mask_duration <- 1
 
 treatments <- c(
-  "TREATMENT_A",
-  "TREATMENT_B"
+  "TREATMENT_A" = "TREATMENT_A",
+  "TREATMENT_B"= "TREATMENT_B"
 )
 
 # Analysis mask
@@ -204,7 +154,7 @@ if (test %in% c("PRE", "POST")) {
   }
 } else if (test == "TRAIN") {
   border_mm <- 7
-  use_default_roi_centers(working_directory, experiment_folder)
+  use_default_roi_centers(".", experiment_folder)
   analysis_mask <- list(Fast_look_PLOT = c(0, Inf))
   p <- idocr(
     experiment_folder = experiment_folder,
@@ -226,3 +176,4 @@ if (test %in% c("PRE", "POST")) {
     height = plot_height, width = plot_width
   )
 }
+setwd(wd)
