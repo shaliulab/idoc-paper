@@ -108,16 +108,19 @@ add_n_annotation <- function(panel, annotation_df, x_annotation = NULL, y_annota
     panel <- panel +
       geom_text(
         data = annotation_df, y = y_annotation, size = textsize, angle = angle,
-        family = family, hjust = text_hjust, vjust = text_vjust,
+        family = family, hjust = text_hjust,
+        vjust = text_vjust,
         mapping = aes(label = paste0("n = ", N)),
         x = x_annotation
       )
   } else {
     panel <- panel +
       geom_text(
-        data = annotation_df, y = y_annotation, size = textsize, angle = angle,
-        family = family, hjust = text_hjust, vjust = text_vjust,
-        mapping = aes(label = paste0("n = ", N), x_annotation = group__),
+        data = annotation_df,
+        mapping = aes(label = paste0("n = ", N), x = x_pos),
+        y = y_annotation, size = textsize, angle = angle,
+        family = family, hjust = text_hjust,
+        vjust = text_vjust,
       )
   }
   return(panel)
@@ -207,8 +210,7 @@ add_significance_marks <- function(
   
   xmin <- xmin+offset
   xmax <- xmax-offset
-  
-  
+
   if (map_signif_level) {
     panel <- panel + geom_signif(
       data = annotation_df,
@@ -220,7 +222,6 @@ add_significance_marks <- function(
       xmin = xmin, xmax = xmax
     )
   } else {
-    print(head(annotation_df))
     panel <- panel + geom_signif(
       data = annotation_df,
       mapping = aes(annotations = paste0("< ", ceiling(p*100)/100), color=NULL, fill=NULL),
@@ -270,8 +271,8 @@ make_annotation_df_boxplots <- function(data, comparisons, correction, test) {
   test_results_df <- data.table(
     p = sapply(test_results, function(x) x$p.value),
     group__ = sapply(comparisons, function(x) paste(x, collapse = "_vs_")),
-    xmin = sapply(comparisons, function(x) mean_x(groups, x[2])),
-    xmax = sapply(comparisons, function(x) mean_x(groups, x[1])),
+    xmin = sapply(comparisons, function(x) min(data[group__ == x[1], x_pos][1], data[group__ == x[2], x_pos][1])),
+    xmax = sapply(comparisons, function(x)  max(data[group__ == x[1], x_pos][1], data[group__ == x[2], x_pos][1])),
     estimate = sapply(test_results, function(x) x$estimate[2])
   )
   test_results_df[, stars := pvalue2stars(p, correction)]

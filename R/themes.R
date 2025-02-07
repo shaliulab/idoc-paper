@@ -16,11 +16,17 @@ learning_plot_theme <- sleep_plot_theme + theme(
   axis.ticks.x = element_blank(),
   axis.text.x = element_blank(),
   axis.line.x = element_blank(),
-  panel.spacing=unit(0, "npc")
+  panel.spacing=unit(0, "npc"),
+  panel.spacing.x = unit(0, "pt")
 )
-summary_plot_theme <- learning_plot_theme
+summary_plot_theme <- learning_plot_theme + theme(
+  panel.spacing = unit(0, "npc")
+)
+# summary_plot_theme <- theme_prism() + theme(
+#   panel.spacing = unit(0, "npc")
+# )
 
-traces_plot_theme <- learning_plot_theme + theme(
+traces_plot_theme <- summary_plot_theme + theme(
   axis.title.y=element_blank(),
   axis.text.x = element_text(size = TEXT_SIZE*0.8),
   axis.line.y = element_blank(),

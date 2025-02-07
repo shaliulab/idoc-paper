@@ -11,13 +11,15 @@ data <- data.table::fread(file = "tidy_data_wide.csv")
 experiments <- c("20min STM", "1hr STM", "3hr STM", "24hr STM")
 wts <- c("Iso31", "MB010B.(II)SPARC-Chrimson ISO", "MB010B.(II)SPARC-GFP ISO")
 CSs <- c("OCT")
+trainings <- "1X"
 valid_reasons <- c("", "?", "Human-override", "Machine-override", "AOJ-override")
 panel2_data <- data[
   PRE_Reason %in% valid_reasons &
     POST_Reason %in% valid_reasons &
     experiment %in% experiments &
     Genotype %in% wts &
-    CS %in% CSs
+    CS %in% CSs &
+    Training == trainings,
 ]
 
 panel2_data <- panel2_data[
@@ -29,8 +31,24 @@ columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "Genotype", "experiment", "PR
 export_csvs(panel2_data, "experiment", experiments, 2, columns)
 
 
-
+panel2_data[, .N, by=.(Genotype, experiment)]
 panel2_data_long <- melt_idoc_data(panel2_data)
+learning_plot(
+  panel2_data_long[experiment=="1hr STM", ],
+  "Genotype",
+  "horizontal",
+  y_limits = c(-1, 1),
+  colors = colors_panel2[1:length(experiments)],
+  map_signif_level = TRUE,
+  y_annotation = 0.75,
+  textsize = 4,
+  angle_n = 45,
+  text_vjust = 1.5,
+  text_hjust = 1,
+  point_size_mean = POINT_SIZE_MEAN*0.7,
+  offset = 0.15,
+  correction = "bonferroni"
+)
 
 panel2A <- learning_plot(
   panel2_data_long, "experiment", "horizontal",

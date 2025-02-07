@@ -24,6 +24,8 @@ panel1_data <- data[
     experiment %in% experiments,
 ]
 
+panel1_data[Files=="2024-12-19_14-23-17_ET_010BIso31_STM_MCH", .(Files, Genotype, experiment, PRE, PRE_Reason, POST, POST_Reason)]
+
 panel1_data[, Group := experiment]
 panel1_data[, experiment := factor(experiment, levels = experiments)]
 
@@ -38,7 +40,7 @@ panel1_data[, Group := factor(Group, levels = groups_in_figure_1)]
 
 
 columns <- c("idoc_folder", "PRE_ROI", "POST_ROI", "Genotype", "experiment", "CS", "PRE", "POST")
-export_csvs(panel1_data, "Group", groups, 1, columns)
+# export_csvs(panel1_data, "Group", groups, 1, columns)
 panel1_data_long <- melt_idoc_data(panel1_data)[, .(Group, id, PI, test, Genotype, CS, Files)]
 
 panel1_data_long_by_user <- melt_idoc_data(panel1_data)[, .(Group, id, PI, POST_ROI, test, Genotype, CS, User, Files)]
@@ -55,10 +57,13 @@ panel1A_user <- learning_plot(
   offset=0.25
 )
 
+sparcs_data <- panel1_data_long_by_user[grepl(pattern="ET", x=User) & CS=="OCT" & Genotype=="MB010B.(II)SPARC-GFP ISO",]
 
-panel1A_4MO1 <- learning_plot(
-  panel1_data_long_by_user[CS=="4MO1",],
-  "User",
+dcast(sparcs_data, Group + id + Genotype + CS + POST_ROI + User + Files ~ test, value.var="PI")
+
+panel1A_sparcs <- learning_plot(
+  sparcs_data,
+  "Files",
   direction = "horizontal",
   y_annotation = 1,
   colors = colors_panel1[1:length(unique(panel1_data_long_by_user$User))],
@@ -69,6 +74,25 @@ panel1A_4MO1 <- learning_plot(
   offset=0.25
 )
 
+
+panel1_4M1O_data <- panel1_data[CS=="4M1O", .(Files, CS, PRE_ROI, POST_ROI, PRE, POST)]
+mean(panel1_4M1O_data$POST)
+
+
+
+panel1A_4M1O <- learning_plot(
+  panel1_data_long_by_user[CS=="4M1O",],
+  "Files",
+  direction = "horizontal",
+  y_annotation = 1,
+  colors = colors_panel1[1:length(unique(panel1_data_long_by_user$User))],
+  y_limits = c(-1, 1),
+  y_breaks = seq(-1, 1, 0.5),
+  text_vjust = 1.5,
+  angle_n = 0,
+  offset=0.25
+)
+panel1A_4M1O
 
 learning_plot(
   panel1_data_long_by_user[CS=="OCT" & User=="ET&AOJ",],

@@ -43,16 +43,21 @@ learning_plot <- function(
     angle_n = 45,
     text_vjust = 0,
     offset = 0,
-    correction = NULL
+    correction = NULL,
+    group_levels = NULL,
+    drop = FALSE
     ) {
+
   if (is.null(group)) {
     df$group__ <- "A"
   } else if (!(group %in% colnames(data))) {
     data$group__ <- group
   } else {
-    data$group__ <- data$group__ <- data[[group]]
+    data$group__ <- data[[group]]
   }
-
+  
+  if (is.null(group_levels)) group_levels <- levels(data[[group]])
+  
   test <- get(paste0(test, "_wilcoxon_test"))
 
   . <- std_error <- id <- annotations <- x <- PI <- group__ <- N <- NULL
@@ -68,8 +73,11 @@ learning_plot <- function(
     correction = correction,
     alt = "greater"
   )
-  data[, x := ifelse(test == "PRE", 1+offset, 2-offset)]
-  annotation_df[, x := ifelse(test == "PRE", 1+offset, 2-offset)]
+  levels(data[[group]]) <- group_levels
+  levels(annotation_df[[group]]) <- group_levels
+  
+  data[, x := ifelse(test == "PRE", 1+0, 2-0)]
+  annotation_df[, x := ifelse(test == "PRE", 1+0, 2-0)]
   
   n_facets <- length(unique(data$group__))
 
@@ -84,6 +92,17 @@ learning_plot <- function(
       linewidth = linewidth
     )
 
+  ggplot(data = data, aes(x = x, y = PI)) +
+    geom_point(
+      size = point_size,
+      color = distribution_color
+    ) +
+    geom_line(
+      aes(group = id),
+      color = distribution_color,
+      linewidth = linewidth
+    )+ facet_wrap(~group__)
+  
   panel <- add_trend_geom(
     panel, annotation_df,
     colors = colors,
@@ -104,7 +123,7 @@ learning_plot <- function(
       angle = angle_n
     )
   }
-  panel <- add_facet(panel, direction)
+  panel <- add_facet(panel, direction, drop=drop)
   
   
 
@@ -124,7 +143,7 @@ learning_plot <- function(
   
   panel <- panel +
     scale_y_continuous(breaks = y_breaks, expand = expansion(add = c(0, 0))) +
-    scale_x_continuous(expand = expansion(add=c(0,0))) +
+    scale_x_continuous(expand = expansion(add=c(offset,0))) +
     coord_cartesian(clip = "off", ylim = y_limits) +
     learning_plot_theme
 
@@ -224,11 +243,11 @@ add_trend_geom <- function(
 
 
 
-add_facet <- function(panel, direction) {
+add_facet <- function(panel, direction, drop=TRUE) {
   if (direction == "horizontal") {
-    panel <- panel + facet_grid(. ~ group__)
+    panel <- panel + facet_grid(. ~ group__, drop=drop)
   } else if (direction == "vertical") {
-    panel <- panel + facet_grid(group__ ~ .)
+    panel <- panel + facet_grid(group__ ~ ., drop=drop)
   }
   return(panel)
 }

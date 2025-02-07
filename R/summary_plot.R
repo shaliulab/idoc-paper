@@ -39,6 +39,7 @@ mean_x <- function(groups, group) {
 summary_plot <- function(
     data, group, comparisons,
     annotation_y,
+    direction = "horizontal",
     test = "unpaired",
     map_signif_level = TRUE,
     colors = NULL,
@@ -60,13 +61,17 @@ summary_plot <- function(
     text_vjust = 0,
     y_annotation_n = -1,
     angle_n = 0,
-    correction = "bonferroni"
+    correction = "bonferroni",
+    drop = FALSE,
+    x_positions = NULL,
+    add_x = 0.5,
+    x_limits = NULL
   ) {
   
   PI <- group__ <- . <- outlier <- N <- NULL
   stopifnot(length(comparisons) == length(annotation_y))
   test <- get(paste0(test, "_wilcoxon_test"))
-
+  
   data <- data.table::copy(data)
   data <- preprocess_function(
     data = data, group = group,
@@ -81,7 +86,7 @@ summary_plot <- function(
   } else {
     gg <- ggplot(data = data, aes(x = group__, y = PI))
   }
-
+  
   data_summ <- data[, .(
     ymin = quantile(PI, percentile[1]),
     lower = quantile(PI, 0.25),
@@ -90,36 +95,58 @@ summary_plot <- function(
     ymax = quantile(PI, percentile[2]),
     N = .N
   ), by = .(group__)]
+  
+  levels(data_summ$group__) <- levels(data$group__)
   for (grp in data_summ$group__) {
     data[group__ == grp & (PI < data_summ[group__ == grp, ymin] | PI > data_summ[group__ == grp, ymax]), outlier := TRUE]
   }
 
 
+  median_data <- data[, .(PI = mean(PI)), by=group__]
+
+  if (is.null(x_positions)) {
+    data_summ[, x_pos := as.numeric(group__)] 
+    data[, x_pos := as.numeric(group__)] 
+    median_data[, x_pos := as.numeric(group__)] 
+  } else {
+    x_positions <- data.table(
+      group__ = factor(levels(data_summ$group__), levels(data_summ$group__)),
+      x_pos = x_positions
+    )
+    data_summ <- merge(data_summ, x_positions, by="group__")
+    data <- merge(data, x_positions, by="group__")
+    median_data <- merge(median_data, x_positions, by="group__")
+  }
+  
   test_results_df <- make_annotation_df_boxplots(
     data, comparisons,
     correction = correction, test = test
   )
-
   thickness <- 1.5
+  median_line_width <- 0.2
   if (geom == "boxplot") {
     gg <- gg +
       geom_boxplot(data = data_summ, stat = "identity", aes(x = group__, y = NULL, ymin = ymin, lower = lower, middle = middle, upper = upper, ymax = ymax), size = thickness, fatten = 0.75) +
-      geom_segment(data = data_summ, aes(x = as.numeric(group__) - 0.25, xend = as.numeric(group__) + 0.25, y = ymin, yend = ymin), linewidth = thickness) + # Lower whisker
-      geom_segment(data = data_summ, aes(x = as.numeric(group__) - 0.25, xend = as.numeric(group__) + 0.25, y = ymax, yend = ymax), linewidth = thickness) + # Upper whisker
+      geom_segment(data = data_summ, aes(x = x_pos - 0.25, xend = x_pos + 0.25, y = ymin, yend = ymin), linewidth = thickness) + # Lower whisker
+      geom_segment(data = data_summ, aes(x = x_pos - 0.25, xend = x_pos + 0.25, y = ymax, yend = ymax), linewidth = thickness) + # Upper whisker
       geom_jitter(data = data[outlier == TRUE, ], aes(x = group__, y = PI), width = 0.1)
   } else if (geom == "sina") {
-    gg <- gg + ggforce::geom_sina(data = data, aes(x = group__, y = PI, col = group__), size = point_size)
+    gg <- gg + ggforce::geom_sina(data = data, aes(x = x_pos, y = PI, col = group__), size = point_size)
   } else if (geom == "violin+sina") {
-    median_data <- data[, .(PI = mean(PI)), by=group__]
-    gg <- gg + geom_violin(data = data, aes(x = group__, y = PI), fill = NA, col = "black") +
-    ggforce::geom_sina(data = data, aes(x = group__, y = PI, col = group__), size = point_size) +
-    geom_segment(
-      data = median_data,
-      mapping = aes(x=as.numeric(group__)-0.2, xend = as.numeric(group__)+0.2, y=PI),
-      linewidth = 2, alpha=0.7
-    )
-    
+    gg <- gg + geom_violin(data = data, aes(x = x_pos, y = PI, group = group__),fill = NA, col = "black") +
+      ggforce::geom_sina(data = data, aes(x = x_pos, y = PI, col = group__), size = point_size) +
+      geom_segment(
+        data = median_data,
+        mapping = aes(
+          x=x_pos - median_line_width,
+          xend = x_pos + median_line_width, y=PI
+        ),
+        linewidth = 2, alpha=0.7
+      )
   }
+  
+  # gg <- add_facet(gg, direction, drop=drop)
+  
   if (!is.null(colors)) {
     if (!length(colors) == length(unique(data$group))) {
       print(paste0(length(colors) != length(unique(data$group))))
@@ -144,9 +171,9 @@ summary_plot <- function(
   }
 
   if (x_labels_angle == 0) {
-    gg <- gg + scale_x_discrete(name = "", expand=expansion(add=c(0.5, 0.5)))
+    gg <- gg + scale_x_continuous(name = "", expand=expansion(add=c(add_x, add_x)))
   } else {
-    gg <- gg + scale_x_discrete(name = "", expand=expansion(add=c(0.5, 0.5)))
+    gg <- gg + scale_x_continuous(name = "", expand=expansion(add=c(add_x, add_x)))
   }
 
   gg <- gg + scale_y_continuous(
@@ -157,9 +184,12 @@ summary_plot <- function(
   for (i  in 1:nrow(test_results_df)) {
       gg <- panel <- tryCatch({
         add_significance_marks(
-          gg, test, test_results_df[i, ], y_annotation = annotation_y[i],
+          gg, test,
+          test_results_df[i, ],
+          y_annotation = annotation_y[i],
           map_signif_level = map_signif_level,
-          family = family, textsize = starsize, offset = 0,
+          family = family, textsize = starsize,
+          offset = 0,
           xmin = test_results_df[i, xmin],
           xmax = test_results_df[i, xmax],
           vjust = vjust
@@ -170,11 +200,21 @@ summary_plot <- function(
         })
   }
 
-  gg <- gg + coord_cartesian(
-    clip = "off",
-    # xlim=0.5+c(0, length(unique(data_summ$group__))),
-    ylim = y_limits
-  ) + summary_plot_theme
+  if (is.null(x_limits)) gg <- gg +
+    coord_cartesian(
+      clip = "off",
+      ylim = y_limits
+    )
+  else {
+    gg <- gg +
+      coord_cartesian(
+        clip = "off",
+        xlim = x_limits,
+        ylim = y_limits
+      )
+  }
+  
+  gg <- gg + summary_plot_theme
 
   n_facets <- length(unique(data$group__))
   data$group__ <- NULL

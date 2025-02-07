@@ -24,7 +24,7 @@ NS_6x_massed <- "#145C9E"
 no_training <- "black"
 paired <- "blue"
 unpaired <- "red"
-dunce <- "green"
+m4o1 <- "green"
 orco <- "brown"
 stm_20min <- "blue"
 stm_1hr <- "#90be6d"
@@ -39,7 +39,7 @@ ERROR_STATISTIC <- "std_error"
 TREND_STATISTIC <- "average"
 
 
-colors_panel1 <- c(paired, unpaired, dunce, orco)
+colors_panel1 <- c(paired, m4o1, unpaired, orco)
 colors_panel2 <- c(stm_20min, stm_1hr, stm_3hr, stm_24hr)
 colors_panel3 <- c(NS_6x_spaced, NS_6X_spaced_cxm, orb2_6x_spaced, orb2_20min)
 colors_panel4 <- c(NS_6x_massed, NS_6x_spaced, no_training, "black")
@@ -60,11 +60,11 @@ print(ERRORBAR_WIDTH)
 POINT_SIZE_MEAN <- width * 0.012
 print(POINT_SIZE)
 print(POINT_SIZE_MEAN)
+SUMMARY_PLOT_POINT_SIZE <- 2
 
 
 LINEWIDTH_MEAN <- 1.2
 VJUST <- 0
-SUMMARY_PLOT_POINT_SIZE <- 2
 
 OUTPUT_FOLDER <- "figures/paper"
 dir.create(OUTPUT_FOLDER, recursive = TRUE)
