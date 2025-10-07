@@ -1,3 +1,16 @@
+
+
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 3) {
+  message(
+    "Usage:
+    Rscript analyze_session.R <working_directory> <experiment_folder> <session> [subtitle]
+    "
+  )
+  stop("")
+  
+}
+
 library(idocr)
 library(dplyr)
 library(ggplot2)
@@ -5,15 +18,15 @@ library(cowplot)
 library(readr)
 
 
-args <- commandArgs(trailingOnly = TRUE)
 working_directory <- args[1]
 experiment_folder <- args[2]
-test <- args[3]
-print(args)
-wd <- getwd()
-
-
-source("scripts/analyze_session_lib.R")
+session <- args[3]
+stopifnot(session %in% c("PRE", "POST", "TRAIN"))
+if (length(args) == 4) {
+  subtitle <- args[4]
+} else {
+  subtitle <- ""
+}
 
 script_name <- tryCatch(
   scriptName::current_filename(),
@@ -21,6 +34,12 @@ script_name <- tryCatch(
     "analyze_session.R"
   }
 )
+
+wd <- getwd()
+
+
+source("scripts/analyze_session_lib.R")
+
 
 message(paste0("Running ", script_name))
 
@@ -32,8 +51,6 @@ src_file <- tryCatch(
   }
 )
 
-# stopifnot(file.exists(src_file))
-
 setwd(working_directory)
 
 
@@ -43,13 +60,7 @@ write_analysis_params(machine_name)
 ################################# experimenter#############################
 experimenter <- ""
 
-experiment_type <- paste0("Aversive_Memory_", test, "_paired")
-CS_plus <- "OCT"
-concentration <- "1:500"
-US_Volt_pulses <- "US = ES_75V 12 pulses 1/4sec_1X"
-Food <- "SA-ATR-"
-Incubator_Light <- "Blue"
-Genotype <- "X"
+experiment_type <- paste0("Aversive_Memory_", session, "_paired")
 
 
 nrow <- 1
@@ -60,7 +71,7 @@ plot_width <- 25
 # Change the name of the labels as you please
 # the first label should match treatment_A on your paradigm
 # the second label should match treatment_B on your paradigm
-labels <- c("OCT", "AIR")
+labels <- c("CS+", "AIR")
 CSplus_idx <- 1 # or 2 depending on   which treatment is CS+
 
 
@@ -108,7 +119,7 @@ treatments <- c(
 # when the mask is active is analyzed. It is marked accordingly on the plot
 # Moreover, you get SUMMARY and PI .csv files
 
-if (test %in% c("PRE", "POST")) {
+if (session %in% c("PRE", "POST")) {
   borders <- 5:10
   masks <- lapply(borders, function(i) {
     list(
@@ -121,9 +132,9 @@ if (test %in% c("PRE", "POST")) {
   i <- 1
   for (border_mm in borders) {
     names(masks[[i]]) <- c(
-      paste0(test, "_GLOBAL_", border_mm, "mm"),
-      paste0(test, "_1_", border_mm, "mm"),
-      paste0(test, "_2_", border_mm, "mm")
+      paste0(session, "_GLOBAL_", border_mm, "mm"),
+      paste0(session, "_1_", border_mm, "mm"),
+      paste0(session, "_2_", border_mm, "mm")
     )
     analysis_mask <- masks[[i]]
 
@@ -137,11 +148,7 @@ if (test %in% c("PRE", "POST")) {
       border_mm = border_mm,
       min_exits_required = min_exits_required,
       src_file = src_file,
-      subtitle = paste0(
-        experimenter, "_", experiment_type, ", ", CS_plus, ", ",
-        concentration, " & ", US_Volt_pulses, ", ", Genotype, ", ",
-        Food, ", ", Incubator_Light
-      ),
+      subtitle = subtitle,
       delay = delay,
       CSplus_idx = CSplus_idx,
       mask_duration = mask_duration,
@@ -152,7 +159,7 @@ if (test %in% c("PRE", "POST")) {
     )
     i <- i + 1
   }
-} else if (test == "TRAIN") {
+} else if (session == "TRAIN") {
   border_mm <- 7
   use_default_roi_centers(".", experiment_folder)
   analysis_mask <- list(Fast_look_PLOT = c(0, Inf))
@@ -162,11 +169,7 @@ if (test %in% c("PRE", "POST")) {
     border_mm = border_mm,
     min_exits_required = min_exits_required,
     src_file = src_file,
-    subtitle = paste0(
-      experimenter, "_", experiment_type, ", ", CS_plus, ", ",
-      concentration, " & ", US_Volt_pulses, ", ", Genotype, ", ",
-      Food, ", ", Incubator_Light
-    ),
+    subtitle = subtitle,
     delay = delay,
     CSplus_idx = CSplus_idx,
     mask_duration = mask_duration,
